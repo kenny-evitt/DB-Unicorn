@@ -6,18 +6,19 @@
 
     using DatabaseObjects;
 
-    public class DatabaseSchema
+    public class DatabaseSchemaAndData
     {
         private readonly string _connectionString;
         
-        public DatabaseSchema(string connectionString)
+        public DatabaseSchemaAndData(string connectionString)
         {
             _connectionString = connectionString;
         }
 
         public List<StoredProcedure> GetStoredProcedures()
         {
-            List<StoredProcedure> _storedProcedures = new List<StoredProcedure>();
+            List<Schema> schemas = new List<Schema>();
+            List<StoredProcedure> storedProcedures = new List<StoredProcedure>();
 
             using (SqlConnection dbConnection = new SqlConnection(_connectionString))
             using (SqlCommand dbSelectCommand = new SqlCommand(@"SELECT	SchemaName = s.name,
@@ -33,11 +34,23 @@ ORDER BY SchemaName, ProcedureName;", dbConnection))
 
                 using (SqlDataReader reader = dbSelectCommand.ExecuteReader())
                 {
+                    string storedProcedureSchemaName = null;
+                    
                     while (reader.Read())
                     {
-                        _storedProcedures.Add(
+                        storedProcedureSchemaName = (string)reader["SchemaName"];
+
+                        Schema storedProcedureSchema = schemas.Find(s => s.Name == storedProcedureSchemaName);
+
+                        if (storedProcedureSchema == null)
+                        {
+                            storedProcedureSchema = new Schema(storedProcedureSchemaName);
+                            schemas.Add(storedProcedureSchema);
+                        }
+
+                        storedProcedures.Add(
                             new StoredProcedure(
-                                (string)reader["SchemaName"],
+                                storedProcedureSchema,
                                 (string)reader["ProcedureName"],
                                 (string)reader["ProcedureText"]));
                     }
@@ -46,7 +59,9 @@ ORDER BY SchemaName, ProcedureName;", dbConnection))
                 dbConnection.Close();
             }
 
-            return _storedProcedures;
+            return storedProcedures;
         }
+
+        
     }
 }

@@ -3,7 +3,7 @@
     public class StoredProcedure
     {
         private readonly string _name;
-        private readonly string _schemaName;
+        private readonly Schema _schema;
         private readonly string _text;
 
         public string Name
@@ -14,11 +14,11 @@
             }
         }
 
-        public string SchemaName
+        public Schema Schema
         {
             get
             {
-                return _schemaName;
+                return _schema;
             }
         }
 
@@ -30,9 +30,9 @@
             }
         }
 
-        public StoredProcedure(string schemaName, string name, string text)
+        public StoredProcedure(Schema schema, string name, string text)
         {
-            _schemaName = schemaName;
+            _schema = schema;
             _name = name;
             _text = text;
         }
