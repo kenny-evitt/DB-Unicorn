@@ -1,5 +1,7 @@
 ﻿namespace DbUnicorn.DatabaseObjects
 {
+    using System;
+
     public class StoredProcedure
     {
         private readonly string _name;
@@ -35,6 +37,28 @@
             _schema = schema;
             _name = name;
             _text = text;
+        }
+
+        public string GenerateDropAndCreateScript()
+        {
+            string compositeFormatScriptTemplate = @"IF EXISTS ( SELECT *
+			FROM sys.objects
+			WHERE	[object_id] = OBJECT_ID(N'{0}')
+					AND [type] IN ( N'P', N'PC' ) )
+
+	DROP PROCEDURE {0};
+GO
+
+SET ANSI_NULLS {1};
+GO
+
+SET QUOTED_IDENTIFIER {2};
+GO
+
+{3}
+GO";
+
+            return String.Format(compositeFormatScriptTemplate, String.Format("{0}.{1}", _schema.Name, _name), "ON", "ON", _text);
         }
     }
 }
