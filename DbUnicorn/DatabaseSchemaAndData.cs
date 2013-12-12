@@ -17,7 +17,6 @@
 
         public List<StoredProcedure> GetStoredProcedures()
         {
-            List<Schema> schemas = new List<Schema>();
             List<StoredProcedure> storedProcedures = new List<StoredProcedure>();
 
             using (SqlConnection dbConnection = new SqlConnection(_connectionString))
@@ -34,23 +33,11 @@ ORDER BY SchemaName, ProcedureName;", dbConnection))
 
                 using (SqlDataReader reader = dbSelectCommand.ExecuteReader())
                 {
-                    string storedProcedureSchemaName = null;
-                    
                     while (reader.Read())
                     {
-                        storedProcedureSchemaName = (string)reader["SchemaName"];
-
-                        Schema storedProcedureSchema = schemas.Find(s => s.Name == storedProcedureSchemaName);
-
-                        if (storedProcedureSchema == null)
-                        {
-                            storedProcedureSchema = new Schema(storedProcedureSchemaName);
-                            schemas.Add(storedProcedureSchema);
-                        }
-
                         storedProcedures.Add(
                             new StoredProcedure(
-                                storedProcedureSchema,
+                                new Schema((string)reader["SchemaName"]),
                                 (string)reader["ProcedureName"],
                                 (string)reader["ProcedureText"]));
                     }
@@ -62,6 +49,38 @@ ORDER BY SchemaName, ProcedureName;", dbConnection))
             return storedProcedures;
         }
 
-        
+        public List<Table> GetTables()
+        {
+            List<Table> tables = new List<Table>();
+
+            using (SqlConnection dbConnection = new SqlConnection(_connectionString))
+            using (SqlCommand dbSelectCommand = new SqlCommand(@"SELECT	TableObjectId = t.[object_id],
+		SchemaName = s.name,
+		TableName = t.name
+FROM	sys.tables t
+		JOIN sys.schemas s ON t.[schema_id] = s.[schema_id]
+ORDER BY SchemaName, TableName;", dbConnection))
+            {
+                dbSelectCommand.CommandType = CommandType.Text;
+                dbConnection.Open();
+
+                using (SqlDataReader reader = dbSelectCommand.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        tables.Add(
+                            new Table(
+                                (int)reader["TableObjectId"],
+                                new Schema((string)reader["SchemaName"]),
+                                (string)reader["TableName"],
+                                null));
+                    }
+                }
+
+                dbConnection.Close();
+            }
+
+            return tables;
+        }
     }
 }

@@ -4,10 +4,16 @@
 
     public class Table
     {
+        // Private fields
+        
         private readonly List<TableColumn> _columns;
         private readonly string _name;
+        private readonly int _objectId;
         private readonly Schema _schema;
 
+        
+        // Public properties
+        
         public List<TableColumn> Columns
         {
             get
@@ -24,6 +30,14 @@
             }
         }
 
+        public int ObjectId
+        {
+            get
+            {
+                return _objectId;
+            }
+        }
+
         public Schema Schema
         {
             get
@@ -32,8 +46,12 @@
             }
         }
 
-        public Table(Schema schema, string name, List<TableColumn> columns)
+
+        // Constructors
+
+        public Table(int objectId, Schema schema, string name, List<TableColumn> columns)
         {
+            _objectId = objectId;
             _schema = schema;
             _name = name;
             _columns = columns;
