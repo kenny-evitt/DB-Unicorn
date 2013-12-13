@@ -7,6 +7,8 @@
         private readonly string _name;
         private readonly Schema _schema;
         private readonly string _text;
+        private readonly bool _usesAnsiNulls;
+        private readonly bool _usesQuotedIdentifiers;
 
         public string Name
         {
@@ -32,11 +34,13 @@
             }
         }
 
-        public StoredProcedure(Schema schema, string name, string text)
+        public StoredProcedure(Schema schema, string name, string text, bool usesAnsiNulls, bool usesQuotedIdentifiers)
         {
             _schema = schema;
             _name = name;
             _text = text;
+            _usesAnsiNulls = usesAnsiNulls;
+            _usesQuotedIdentifiers = usesQuotedIdentifiers;
         }
 
         public string GenerateDropAndCreateScript()
@@ -64,7 +68,12 @@ GO";
         
         public string GenerateDropAndCreateScript(string scriptTemplate)
         {
-            return String.Format(scriptTemplate, String.Format("{0}.{1}", _schema.Name, _name), "ON", "ON", _text);
+            return String.Format(
+                    scriptTemplate,
+                    String.Format("{0}.{1}", _schema.Name, _name),
+                    ScriptingHelpers.ConvertBooleanToOnOrOffString(_usesAnsiNulls),
+                    ScriptingHelpers.ConvertBooleanToOnOrOffString(_usesQuotedIdentifiers),
+                    _text);
         }
     }
 }

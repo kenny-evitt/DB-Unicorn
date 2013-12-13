@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DatabaseObjects\Schema.cs" />
+    <Compile Include="DatabaseObjects\ScriptingHelpers.cs" />
     <Compile Include="DatabaseObjects\StoredProcedure.cs" />
     <Compile Include="DatabaseObjects\Table.cs" />
     <Compile Include="DatabaseObjects\TableColumn.cs" />

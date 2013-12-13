@@ -22,7 +22,9 @@
             using (SqlConnection dbConnection = new SqlConnection(_connectionString))
             using (SqlCommand dbSelectCommand = new SqlCommand(@"SELECT	SchemaName = s.name,
 		ProcedureName = p.name,
-		ProcedureText = m.[definition]
+		ProcedureText = m.[definition],
+		ProcedureUsesAnsiNulls = m.uses_ansi_nulls,
+		ProcedureUsesQuotedIdentifiers = m.uses_quoted_identifier
 FROM	sys.procedures p
 		JOIN sys.schemas s ON p.[schema_id] = s.[schema_id]
 		JOIN sys.sql_modules m ON p.[object_id] = m.[object_id]
@@ -37,9 +39,12 @@ ORDER BY SchemaName, ProcedureName;", dbConnection))
                     {
                         storedProcedures.Add(
                             new StoredProcedure(
-                                new Schema((string)reader["SchemaName"]),
-                                (string)reader["ProcedureName"],
-                                (string)reader["ProcedureText"]));
+                                new Schema(
+                                    (string)reader["SchemaName"]),
+                                    (string)reader["ProcedureName"],
+                                    (string)reader["ProcedureText"],
+                                    (bool)reader["ProcedureUsesAnsiNulls"],
+                                    (bool)reader["ProcedureUsesQuotedIdentifiers"]));
                     }
                 }
 
