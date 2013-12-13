@@ -58,7 +58,13 @@ GO
 {3}
 GO";
 
-            return String.Format(compositeFormatScriptTemplate, String.Format("{0}.{1}", _schema.Name, _name), "ON", "ON", _text);
+            return GenerateDropAndCreateScript(compositeFormatScriptTemplate);
+        }
+
+        
+        public string GenerateDropAndCreateScript(string scriptTemplate)
+        {
+            return String.Format(scriptTemplate, String.Format("{0}.{1}", _schema.Name, _name), "ON", "ON", _text);
         }
     }
 }
