@@ -65,12 +65,21 @@ GO";
             return GenerateDropAndCreateScript(compositeFormatScriptTemplate);
         }
 
-        
         public string GenerateDropAndCreateScript(string scriptTemplate)
         {
             return String.Format(
                     scriptTemplate,
                     String.Format("{0}.{1}", _schema.Name, _name),
+                    ScriptingHelpers.ConvertBooleanToOnOrOffString(_usesAnsiNulls),
+                    ScriptingHelpers.ConvertBooleanToOnOrOffString(_usesQuotedIdentifiers),
+                    _text);
+        }
+
+        public string GenerateDropAndCreateScript(string scriptTemplate, string procedureNameTemplate)
+        {
+            return String.Format(
+                    scriptTemplate,
+                    String.Format("procedureNameTemplate", _schema.Name, _name),
                     ScriptingHelpers.ConvertBooleanToOnOrOffString(_usesAnsiNulls),
                     ScriptingHelpers.ConvertBooleanToOnOrOffString(_usesQuotedIdentifiers),
                     _text);
