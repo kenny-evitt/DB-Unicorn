@@ -79,7 +79,7 @@ GO";
         {
             return String.Format(
                     scriptTemplate,
-                    String.Format("procedureNameTemplate", _schema.Name, _name),
+                    String.Format(procedureNameTemplate, _schema.Name, _name),
                     ScriptingHelpers.ConvertBooleanToOnOrOffString(_usesAnsiNulls),
                     ScriptingHelpers.ConvertBooleanToOnOrOffString(_usesQuotedIdentifiers),
                     _text);
