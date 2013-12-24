@@ -2,7 +2,7 @@
 {
     using System;
 
-    public class StoredProcedure
+    public class StoredProcedure : IDatabaseObject
     {
         private readonly string _name;
         private readonly Schema _schema;

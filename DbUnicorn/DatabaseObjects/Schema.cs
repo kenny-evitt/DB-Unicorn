@@ -1,8 +1,9 @@
 ﻿namespace DbUnicorn.DatabaseObjects
 {
+    using System;
     using System.Collections.Generic;
 
-    public class Schema
+    public class Schema : IDatabaseObject, IEquatable<Schema>
     {
         // Private fields
         
@@ -30,9 +31,24 @@
 
         // Public methods
 
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as Schema);
+        }
+        
+        public bool Equals(Schema other)
+        {
+            return _name == other.Name;
+        }
+        
         public static IEqualityComparer<Schema> GetEqualityComparer()
         {
             return new SchemaEqualityComparer();
+        }
+
+        public override int GetHashCode()
+        {
+            return _name.GetHashCode();
         }
 
 
@@ -42,12 +58,12 @@
         {
             public bool Equals(Schema schema1, Schema schema2)
             {
-                return schema1.Name == schema2.Name;
+                return schema1.Equals(schema2);
             }
 
             public int GetHashCode(Schema schema)
             {
-                return schema.Name.GetHashCode();
+                return schema.GetHashCode();
             }
         }
     }
