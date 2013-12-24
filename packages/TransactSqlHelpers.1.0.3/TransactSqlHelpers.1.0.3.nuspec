@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>TransactSqlHelpers</id>
+    <version>1.0.3</version>
+    <title>Transact-SQL Helpers</title>
+    <authors>Kenny Evitt</authors>
+    <owners>Kenny Evitt</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Transact-SQL Helper Library</description>
+    <summary />
+    <releaseNotes />
+    <copyright>Copyright © Kenny Evitt</copyright>
+  </metadata>
+</package>
