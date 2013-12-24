@@ -73,13 +73,7 @@
             return _schema == other.Schema && _name == other.Name && _objectId == other.ObjectId;
         }
 
-        public override int GetHashCode()
-        {
-            return _schema.GetHashCode() ^ _name.GetHashCode() ^ _objectId.GetHashCode();
-        }
 
-
-        // Private methods
 
         /// <summary>
         /// Generates foreign-key table relationship info in the DOT language format. See 
@@ -87,7 +81,7 @@
         /// by Graphviz for generating diagrams from 'graphs'.
         /// </summary>
         /// <returns>A DOT language string</returns>
-        private string GenerateForeignKeyRelationshipsDot(List<TableRelationship> relationshipTree)
+        public string GenerateForeignKeyRelationshipsAsDot(List<TableRelationship> relationshipTree)
         {
             StringBuilder relationshipsDotString = new StringBuilder();
 
@@ -131,8 +125,15 @@
             }
 
             relationshipsDotString.Append("}");
-            
+
             return relationshipsDotString.ToString();
+        }
+
+
+
+        public override int GetHashCode()
+        {
+            return _schema.GetHashCode() ^ _name.GetHashCode() ^ _objectId.GetHashCode();
         }
     }
 }

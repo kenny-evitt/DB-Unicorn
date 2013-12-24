@@ -15,6 +15,9 @@
             _connectionString = connectionString;
         }
 
+
+        // Public methods
+
         public List<StoredProcedure> GetStoredProcedures()
         {
             List<StoredProcedure> storedProcedures = new List<StoredProcedure>();
@@ -156,13 +159,60 @@ WHERE	o_referenced_schema.[name] = @objectSchemaName
             return references;
         }
 
+        public string GenerateTableForeignKeyRelationshipTreeAsDot(Table table)
+        {
+            return table.GenerateForeignKeyRelationshipsAsDot(GenerateTableForeignKeyRelationshipTree(table));
+        }
+
+        public List<Table> GetTables()
+        {
+            List<Table> tables = new List<Table>();
+
+            using (SqlConnection dbConnection = new SqlConnection(_connectionString))
+            using (SqlCommand dbSelectCommand = new SqlCommand(@"SELECT	TableObjectId = t.[object_id],
+		SchemaName = s.name,
+		TableName = t.name
+FROM	sys.tables t
+		JOIN sys.schemas s ON t.[schema_id] = s.[schema_id]
+ORDER BY SchemaName, TableName;", dbConnection))
+            {
+                dbSelectCommand.CommandType = CommandType.Text;
+                dbConnection.Open();
+
+                using (SqlDataReader reader = dbSelectCommand.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        tables.Add(
+                            new Table(
+                                (int)reader["TableObjectId"],
+                                new Schema((string)reader["SchemaName"]),
+                                (string)reader["TableName"],
+                                null));
+                    }
+                }
+
+                dbConnection.Close();
+            }
+
+            return tables;
+        }
+
+
+
+
+
+        // Private methods
+
+
+
         /// <summary>
         /// Get the full tree of all tables referenced-by or referencing the given table via a
         /// foreign key relationship, directly or indirectly (i.e. via a third table).
         /// </summary>
         /// <param name="table"></param>
         /// <returns></returns>
-        private List<TableRelationship> GetTableForeignKeyRelationshipTree(Table table)
+        private List<TableRelationship> GenerateTableForeignKeyRelationshipTree(Table table)
         {
             List<TableRelationship> relationshipTree = new List<TableRelationship>();
 
@@ -228,40 +278,6 @@ WHERE	o_referenced_schema.[name] = @objectSchemaName
             relationshipTree.AddRange(backwardReferences);
 
             return relationshipTree;
-        }
-
-        public List<Table> GetTables()
-        {
-            List<Table> tables = new List<Table>();
-
-            using (SqlConnection dbConnection = new SqlConnection(_connectionString))
-            using (SqlCommand dbSelectCommand = new SqlCommand(@"SELECT	TableObjectId = t.[object_id],
-		SchemaName = s.name,
-		TableName = t.name
-FROM	sys.tables t
-		JOIN sys.schemas s ON t.[schema_id] = s.[schema_id]
-ORDER BY SchemaName, TableName;", dbConnection))
-            {
-                dbSelectCommand.CommandType = CommandType.Text;
-                dbConnection.Open();
-
-                using (SqlDataReader reader = dbSelectCommand.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        tables.Add(
-                            new Table(
-                                (int)reader["TableObjectId"],
-                                new Schema((string)reader["SchemaName"]),
-                                (string)reader["TableName"],
-                                null));
-                    }
-                }
-
-                dbConnection.Close();
-            }
-
-            return tables;
         }
     }
 }
