@@ -1,5 +1,6 @@
 ﻿namespace DbUnicorn
 {
+    using System;
     using System.Collections.Generic;
     using System.Data;
     using System.Data.SqlClient;
@@ -162,6 +163,45 @@ WHERE	o_referenced_schema.[name] = @objectSchemaName
         public string GenerateTableForeignKeyRelationshipTreeAsDot(Table table)
         {
             return table.GenerateForeignKeyRelationshipsAsDot(GenerateTableForeignKeyRelationshipTree(table));
+        }
+
+        public string GenerateTableForeignKeyRelationshipTreeAsDot(int tableObjectId)
+        {
+            Table table = this.GetTable(tableObjectId);
+            
+            return table.GenerateForeignKeyRelationshipsAsDot(GenerateTableForeignKeyRelationshipTree(table));
+        }
+
+        public Table GetTable(int tableObjectId)
+        {
+            using (SqlConnection dbConnection = new SqlConnection(_connectionString))
+            using (SqlCommand dbSelectCommand = new SqlCommand(@"SELECT	SchemaName = s.name,
+		TableName = t.name
+FROM	sys.tables t
+		JOIN sys.schemas s ON t.[schema_id] = s.[schema_id]
+WHERE t.[object_id] = @tableObjectId
+ORDER BY SchemaName, TableName;", dbConnection))
+            {
+                dbSelectCommand.CommandType = CommandType.Text;
+                dbSelectCommand.Parameters.AddWithValue("tableObjectId", tableObjectId);
+                dbConnection.Open();
+
+                using (SqlDataReader reader = dbSelectCommand.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        return new Table(
+                            tableObjectId,
+                            new Schema((string)reader["SchemaName"]),
+                            (string)reader["TableName"],
+                            null);
+                    }
+                }
+
+                dbConnection.Close();
+            }
+
+            throw new ApplicationException(String.Format("No table found for object ID {0}", tableObjectId));
         }
 
         public List<Table> GetTables()
