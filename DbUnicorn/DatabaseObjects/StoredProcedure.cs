@@ -43,6 +43,9 @@
             _usesQuotedIdentifiers = usesQuotedIdentifiers;
         }
 
+
+        // Public methods
+
         public string GenerateDropAndCreateScript()
         {
             string compositeFormatScriptTemplate = @"IF EXISTS ( SELECT *
@@ -67,22 +70,37 @@ GO";
 
         public string GenerateDropAndCreateScript(string scriptTemplate)
         {
-            return String.Format(
-                    scriptTemplate,
-                    String.Format("{0}.{1}", _schema.Name, _name),
-                    ScriptingHelpers.ConvertBooleanToOnOrOffString(_usesAnsiNulls),
-                    ScriptingHelpers.ConvertBooleanToOnOrOffString(_usesQuotedIdentifiers),
-                    _text);
+            return GenerateDropAndCreateScript(scriptTemplate, "{0}.{1}");
         }
 
         public string GenerateDropAndCreateScript(string scriptTemplate, string procedureNameTemplate)
         {
+            return GenerateDropAndCreateScript(scriptTemplate, procedureNameTemplate, false);
+        }
+
+        public string GenerateDropAndCreateScript(string scriptTemplate, string procedureNameTemplate, bool replaceProcedureNameInProcedureText)
+        {
+            string procedureName = String.Format(procedureNameTemplate, _schema.Name, _name);
+            
             return String.Format(
                     scriptTemplate,
-                    String.Format(procedureNameTemplate, _schema.Name, _name),
+                    procedureName,
                     ScriptingHelpers.ConvertBooleanToOnOrOffString(_usesAnsiNulls),
                     ScriptingHelpers.ConvertBooleanToOnOrOffString(_usesQuotedIdentifiers),
-                    _text);
+                    !replaceProcedureNameInProcedureText ? _text : ReplaceProcedureNameInProcedureText(procedureName));
+        }
+
+
+        // Private methods
+
+        private string ReplaceProcedureNameInProcedureText(string newProcedureName)
+        {
+            Tuple<int, int> procedureNameStartAndLength = ScriptingHelpers.FindStoredProcedureNameInCreateScript(_text);
+
+            int procedureNameStart = procedureNameStartAndLength.Item1;
+
+            return _text.Remove(procedureNameStart, procedureNameStartAndLength.Item2)
+                .Insert(procedureNameStart, newProcedureName);
         }
     }
 }
