@@ -18,7 +18,7 @@
         /// the stored procedure name in the 'create script' string.</returns>
         public static Tuple<int, int> FindStoredProcedureNameInCreateScript(string createScript)
         {
-            Regex storedProcedureNameRegex = new Regex(@"CREATE\s+PROC(?:EDURE)?\s+(?<fullName>(?:(?<schemaName>[\p{L}_][\p{L}\p{N}@$#_]{0,127}|[""\[][^\[\]]{1,128}[""\]])\.)?(?<procedureName>[\p{L}_][\p{L}\p{N}@$#_]{0,127}|[""\[][^\[\]]{1,128}[""\]]))\s+", RegexOptions.IgnoreCase);
+            Regex storedProcedureNameRegex = new Regex(@"CREATE\s+PROC(?:EDURE)?\s+(?<fullName>(?:(?<schemaName>[\p{L}_][\p{L}\p{N}@$#_]{0,127}|[""\[][^\[\]]{1,128}[""\]])\.)?(?<procedureName>[\p{L}_][\p{L}\p{N}@$#_]{0,127}|[""\[][^\[\]]{1,128}[""\]]))(?:\s+|\()", RegexOptions.IgnoreCase);
 
             Match match = storedProcedureNameRegex.Match(createScript);
 
