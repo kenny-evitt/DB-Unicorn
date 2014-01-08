@@ -119,6 +119,80 @@ ORDER BY SchemaName, ProcedureName;", dbConnection))
             return referencers;
         }
 
+        /// <summary>
+        /// Get the full tree of all tables referenced-by or referencing the given table via a
+        /// foreign key relationship, directly or indirectly (i.e. via a third table).
+        /// </summary>
+        /// <param name="table"></param>
+        /// <returns></returns>
+        public List<TableRelationship> GenerateTableForeignKeyRelationshipTree(Table table)
+        {
+            List<TableRelationship> relationshipTree = new List<TableRelationship>();
+
+
+            // Determine all of the 'forward' references, i.e. the tree of objects that *are referenced by* the given object.
+
+            int currentReferenceLevel = 1;
+            List<TableRelationship> currentLevelReferences = GetTableForeignKeyRelationshipReferences(table);
+            List<TableRelationship> nextLevelReferences = new List<TableRelationship>();
+
+            do
+            {
+                nextLevelReferences.Clear();
+
+                foreach (TableRelationship reference in currentLevelReferences)
+                {
+                    // If the reference is new, add all of its references to the tree.
+
+                    if ((!(table.Schema.Name == reference.ReferencedTable.Schema.Name && table.Name == reference.ReferencedTable.Name))
+                        && (!relationshipTree.Exists(x => x.ReferencedTable.Schema.Name == reference.ReferencedTable.Schema.Name && x.ReferencedTable.Name == reference.ReferencedTable.Name))
+                        && (!nextLevelReferences.Exists(x => x.BaseTable.Schema.Name == reference.ReferencedTable.Schema.Name && x.BaseTable.Name == reference.ReferencedTable.Name)))
+                    {
+                        nextLevelReferences.AddRange(GetTableForeignKeyRelationshipReferences(reference.ReferencedTable, currentReferenceLevel + 1));
+                    }
+                }
+
+                relationshipTree.AddRange(currentLevelReferences);
+                currentReferenceLevel++;
+                currentLevelReferences.Clear();
+                currentLevelReferences.AddRange(nextLevelReferences);
+            } while (nextLevelReferences.Count > 1);
+
+
+            // Determine all of the 'backward' references, i.e. the tree of objects that *reference* the given object.
+
+            List<TableRelationship> backwardReferences = new List<TableRelationship>();
+            currentReferenceLevel = -1;
+            currentLevelReferences = GetTableForeignKeyRelationshipReferencers(table);
+
+            do
+            {
+                nextLevelReferences.Clear();
+
+                foreach (TableRelationship reference in currentLevelReferences)
+                {
+                    // If the referencer is new, add all of its referencers to the tree.
+
+                    if ((!(table.Schema.Name == reference.BaseTable.Schema.Name && table.Name == reference.BaseTable.Name))
+                        && (!backwardReferences.Exists(x => x.BaseTable.Schema.Name == reference.BaseTable.Schema.Name && x.BaseTable.Name == reference.BaseTable.Name))
+                        && (!nextLevelReferences.Exists(x => x.ReferencedTable.Schema.Name == reference.BaseTable.Schema.Name && x.ReferencedTable.Name == reference.BaseTable.Name)))
+                    {
+                        nextLevelReferences.AddRange(GetTableForeignKeyRelationshipReferencers(reference.BaseTable, currentReferenceLevel - 1));
+                    }
+                }
+
+                backwardReferences.AddRange(currentLevelReferences);
+                currentReferenceLevel--;
+                currentLevelReferences.Clear();
+                currentLevelReferences.AddRange(nextLevelReferences);
+            } while (nextLevelReferences.Count > 1);
+
+
+            relationshipTree.AddRange(backwardReferences);
+
+            return relationshipTree;
+        }
+
         public string GenerateTableForeignKeyRelationshipTreeAsDot(Table table)
         {
             return table.GenerateForeignKeyRelationshipsAsDot(GenerateTableForeignKeyRelationshipTree(table));
@@ -195,88 +269,6 @@ ORDER BY SchemaName, TableName;", dbConnection))
             }
 
             return tables;
-        }
-
-
-
-
-
-        // Private methods
-
-
-
-        /// <summary>
-        /// Get the full tree of all tables referenced-by or referencing the given table via a
-        /// foreign key relationship, directly or indirectly (i.e. via a third table).
-        /// </summary>
-        /// <param name="table"></param>
-        /// <returns></returns>
-        public List<TableRelationship> GenerateTableForeignKeyRelationshipTree(Table table)
-        {
-            List<TableRelationship> relationshipTree = new List<TableRelationship>();
-
-
-            // Determine all of the 'forward' references, i.e. the tree of objects that *are referenced by* the given object.
-
-            int currentReferenceLevel = 1;
-            List<TableRelationship> currentLevelReferences = GetTableForeignKeyRelationshipReferences(table);
-            List<TableRelationship> nextLevelReferences = new List<TableRelationship>();
-
-            do
-            {
-                nextLevelReferences.Clear();
-
-                foreach (TableRelationship reference in currentLevelReferences)
-                {
-                    // If the reference is new, add all of its references to the tree.
-
-                    if ((!(table.Schema.Name == reference.ReferencedTable.Schema.Name && table.Name == reference.ReferencedTable.Name))
-                        && (!relationshipTree.Exists(x => x.ReferencedTable.Schema.Name == reference.ReferencedTable.Schema.Name && x.ReferencedTable.Name == reference.ReferencedTable.Name))
-                        && (!nextLevelReferences.Exists(x => x.BaseTable.Schema.Name == reference.ReferencedTable.Schema.Name && x.BaseTable.Name == reference.ReferencedTable.Name)))
-                    {
-                        nextLevelReferences.AddRange(GetTableForeignKeyRelationshipReferences(reference.ReferencedTable, currentReferenceLevel + 1));
-                    }
-                }
-
-                relationshipTree.AddRange(currentLevelReferences);
-                currentReferenceLevel++;
-                currentLevelReferences.Clear();
-                currentLevelReferences.AddRange(nextLevelReferences);
-            } while (nextLevelReferences.Count > 1);
-
-
-            // Determine all of the 'backward' references, i.e. the tree of objects that *reference* the given object.
-
-            List<TableRelationship> backwardReferences = new List<TableRelationship>();
-            currentReferenceLevel = -1;
-            currentLevelReferences = GetTableForeignKeyRelationshipReferencers(table);
-
-            do
-            {
-                nextLevelReferences.Clear();
-
-                foreach (TableRelationship reference in currentLevelReferences)
-                {
-                    // If the referencer is new, add all of its referencers to the tree.
-
-                    if ((!(table.Schema.Name == reference.BaseTable.Schema.Name && table.Name == reference.BaseTable.Name))
-                        && (!backwardReferences.Exists(x => x.BaseTable.Schema.Name == reference.BaseTable.Schema.Name && x.BaseTable.Name == reference.BaseTable.Name))
-                        && (!nextLevelReferences.Exists(x => x.ReferencedTable.Schema.Name == reference.BaseTable.Schema.Name && x.ReferencedTable.Name == reference.BaseTable.Name)))
-                    {
-                        nextLevelReferences.AddRange(GetTableForeignKeyRelationshipReferencers(reference.BaseTable, currentReferenceLevel - 1));
-                    }
-                }
-
-                backwardReferences.AddRange(currentLevelReferences);
-                currentReferenceLevel--;
-                currentLevelReferences.Clear();
-                currentLevelReferences.AddRange(nextLevelReferences);
-            } while (nextLevelReferences.Count > 1);
-
-
-            relationshipTree.AddRange(backwardReferences);
-
-            return relationshipTree;
         }
     }
 }
