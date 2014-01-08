@@ -171,7 +171,8 @@ ORDER BY SchemaName, ProcedureName;", dbConnection))
 
                 foreach (TableRelationship reference in currentLevelReferences)
                 {
-                    // If the referencer is new, add all of its referencers to the tree.
+                    // If the referencer (backward reference) is new, add all of *its* referencers 
+                    // to the tree.
 
                     if ((!(table.Schema.Name == reference.BaseTable.Schema.Name && table.Name == reference.BaseTable.Name))
                         && (!backwardReferences.Exists(x => x.BaseTable.Schema.Name == reference.BaseTable.Schema.Name && x.BaseTable.Name == reference.BaseTable.Name))
