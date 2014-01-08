@@ -100,45 +100,23 @@ ORDER BY SchemaName, ProcedureName;", dbConnection))
         /// <returns></returns>
         public List<TableRelationship> GetTableForeignKeyRelationshipReferencers(Table table, int tableReferenceLevel = -1)
         {
-            List<TableRelationship> references = new List<TableRelationship>();
+            List<TableRelationship> referencers = new List<TableRelationship>();
 
-            using (SqlConnection dbConnection = new SqlConnection(_connectionString))
-            using (SqlCommand dbSelectCommand = new SqlCommand(@"SELECT	SchemaName = o_parent_schema.[name],
-		ObjectId = o_parent.[object_id],
-		ObjectName = o_parent.[name]
-FROM	sys.foreign_keys fk
-		JOIN sys.objects o_parent ON fk.parent_object_id = o_parent.object_id
-		JOIN sys.schemas o_parent_schema ON o_parent.schema_id = o_parent_schema.schema_id
-		JOIN sys.objects o_referenced ON fk.referenced_object_id = o_referenced.object_id
-		JOIN sys.schemas o_referenced_schema ON o_referenced.schema_id = o_referenced_schema.schema_id
-WHERE	o_referenced_schema.[name] = @objectSchemaName
-		AND o_referenced.[name] = @objectName;", dbConnection))
+            using (DataTable data = _database.GetTableForeignKeyRelationshipReferencers(table.Schema.Name, table.Name))
             {
-                dbSelectCommand.CommandType = CommandType.Text;
-                dbSelectCommand.Parameters.AddWithValue("objectSchemaName", table.Schema.Name);
-                dbSelectCommand.Parameters.AddWithValue("objectName", table.Name);
-                dbConnection.Open();
-
-                using (SqlDataReader reader = dbSelectCommand.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        references.Add(
-                            new TableRelationship(
-                                tableReferenceLevel,
-                                new Table(
-                                    (int)reader["ObjectId"],
-                                    new Schema((string)reader["SchemaName"]),
-                                    (string)reader["ObjectName"],
-                                    null),
-                                table));
-                    }
-                }
-
-                dbConnection.Close();
+                referencers = (from row in data.AsEnumerable()
+                               select new TableRelationship(
+                                   tableReferenceLevel,
+                                   table,
+                                   new Table(
+                                       (int)(row["ObjectId"]),
+                                       new Schema((string)(row["SchemaName"])),
+                                       (string)(row["ObjectName"]),
+                                       null))
+                            ).ToList<TableRelationship>();
             }
 
-            return references;
+            return referencers;
         }
 
         public string GenerateTableForeignKeyRelationshipTreeAsDot(Table table)
