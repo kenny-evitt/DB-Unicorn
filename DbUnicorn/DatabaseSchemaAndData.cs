@@ -211,7 +211,7 @@ ORDER BY SchemaName, TableName;", dbConnection))
         /// </summary>
         /// <param name="table"></param>
         /// <returns></returns>
-        private List<TableRelationship> GenerateTableForeignKeyRelationshipTree(Table table)
+        public List<TableRelationship> GenerateTableForeignKeyRelationshipTree(Table table)
         {
             List<TableRelationship> relationshipTree = new List<TableRelationship>();
 
