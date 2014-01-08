@@ -13,10 +13,10 @@
         private readonly string _connectionString;
         private readonly IDatabase _database;
         
-        public DatabaseSchemaAndData(string connectionString)
+        public DatabaseSchemaAndData(string connectionString, IDatabase database)
         {
             _connectionString = connectionString;
-            _database = (IDatabase)(new SqlServerDatabase(connectionString));
+            _database = database;
         }
 
 
