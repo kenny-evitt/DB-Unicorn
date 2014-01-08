@@ -4,16 +4,19 @@
     using System.Collections.Generic;
     using System.Data;
     using System.Data.SqlClient;
+    using System.Linq;
 
     using DatabaseObjects;
 
     public class DatabaseSchemaAndData
     {
         private readonly string _connectionString;
+        private readonly IDatabase _database;
         
         public DatabaseSchemaAndData(string connectionString)
         {
             _connectionString = connectionString;
+            _database = (IDatabase)(new SqlServerDatabase(connectionString));
         }
 
 
@@ -70,40 +73,18 @@ ORDER BY SchemaName, ProcedureName;", dbConnection))
         {
             List<TableRelationship> references = new List<TableRelationship>();
 
-            using (SqlConnection dbConnection = new SqlConnection(_connectionString))
-            using (SqlCommand dbSelectCommand = new SqlCommand(@"SELECT	SchemaName = o_referenced_schema.[name],
-		ObjectId = o_referenced.[object_id],
-		ObjectName = o_referenced.[name]
-FROM	sys.foreign_keys fk
-		JOIN sys.objects o_parent ON fk.parent_object_id = o_parent.object_id
-		JOIN sys.schemas o_parent_schema ON o_parent.schema_id = o_parent_schema.schema_id
-		JOIN sys.objects o_referenced ON fk.referenced_object_id = o_referenced.object_id
-		JOIN sys.schemas o_referenced_schema ON o_referenced.schema_id = o_referenced_schema.schema_id
-WHERE	o_parent_schema.[name] = @objectSchemaName
-		AND o_parent.[name] = @objectName;", dbConnection))
+            using (DataTable data = _database.GetTableForeignKeyRelationshipReferences(table.Schema.Name, table.Name))
             {
-                dbSelectCommand.CommandType = CommandType.Text;
-                dbSelectCommand.Parameters.AddWithValue("objectSchemaName", table.Schema.Name);
-                dbSelectCommand.Parameters.AddWithValue("objectName", table.Name);
-                dbConnection.Open();
-
-                using (SqlDataReader reader = dbSelectCommand.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        references.Add(
-                            new TableRelationship(
-                                tableReferenceLevel,
-                                table,
-                                new Table(
-                                    (int)reader["ObjectId"],
-                                    new Schema((string)reader["SchemaName"]),
-                                    (string)reader["ObjectName"],
-                                    null)));
-                    }
-                }
-
-                dbConnection.Close();
+                references = (from row in data.AsEnumerable()
+                              select new TableRelationship(
+                                  tableReferenceLevel,
+                                  table,
+                                  new Table(
+                                      (int)(row["ObjectId"]),
+                                      new Schema((string)(row["SchemaName"])),
+                                      (string)(row["ObjectName"]),
+                                      null))
+                            ).ToList<TableRelationship>();
             }
 
             return references;
