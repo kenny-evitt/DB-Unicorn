@@ -165,6 +165,9 @@ ORDER BY SchemaName, ProcedureName;", dbConnection))
             currentReferenceLevel = -1;
             currentLevelReferences = GetTableForeignKeyRelationshipReferencers(table);
 
+            // Remove self-references, as they're already covered by 'forward references'.
+            currentLevelReferences.RemoveAll(r => table.Schema.Name == r.BaseTable.Schema.Name && table.Name == r.BaseTable.Name);
+
             do
             {
                 nextLevelReferences.Clear();
@@ -174,8 +177,7 @@ ORDER BY SchemaName, ProcedureName;", dbConnection))
                     // If the referencer (backward reference) is new, add all of *its* referencers 
                     // to the tree.
 
-                    if ((!(table.Schema.Name == reference.BaseTable.Schema.Name && table.Name == reference.BaseTable.Name))
-                        && (!backwardReferences.Exists(x => x.BaseTable.Schema.Name == reference.BaseTable.Schema.Name && x.BaseTable.Name == reference.BaseTable.Name))
+                    if ((!backwardReferences.Exists(x => x.BaseTable.Schema.Name == reference.BaseTable.Schema.Name && x.BaseTable.Name == reference.BaseTable.Name))
                         && (!nextLevelReferences.Exists(x => x.ReferencedTable.Schema.Name == reference.BaseTable.Schema.Name && x.ReferencedTable.Name == reference.BaseTable.Name)))
                     {
                         nextLevelReferences.AddRange(GetTableForeignKeyRelationshipReferencers(reference.BaseTable, currentReferenceLevel - 1));
