@@ -4,7 +4,10 @@
 
     public interface IDatabase
     {
+        DataTable GetStoredProcedures();
+        DataTable GetTable(int tableObjectId);
         DataTable GetTableForeignKeyRelationshipReferencers(string schemaName, string tableName);
         DataTable GetTableForeignKeyRelationshipReferences(string schemaName, string tableName);
+        DataTable GetTables();
     }
 }

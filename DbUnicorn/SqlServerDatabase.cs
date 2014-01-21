@@ -20,6 +20,88 @@
 
         // Public methods
 
+        public DataTable GetStoredProcedures()
+        {
+            DataTable storedProcedures = new DataTable();
+
+            using (SqlConnection dbConnection = new SqlConnection(_connectionString))
+            using (SqlCommand dbSelectCommand = new SqlCommand(@"SELECT	SchemaName = s.name,
+		ProcedureName = p.name,
+		ProcedureText = m.[definition],
+		ProcedureUsesAnsiNulls = m.uses_ansi_nulls,
+		ProcedureUsesQuotedIdentifiers = m.uses_quoted_identifier
+FROM	sys.procedures p
+		JOIN sys.schemas s ON p.[schema_id] = s.[schema_id]
+		JOIN sys.sql_modules m ON p.[object_id] = m.[object_id]
+ORDER BY SchemaName, ProcedureName;", dbConnection))
+            {
+                dbSelectCommand.CommandType = CommandType.Text;
+                dbConnection.Open();
+
+                using (SqlDataReader reader = dbSelectCommand.ExecuteReader())
+                {
+                    storedProcedures.Load(reader);
+                }
+
+                dbConnection.Close();
+            }
+
+            return storedProcedures;
+        }
+
+        public DataTable GetTable(int tableObjectId)
+        {
+            DataTable table = new DataTable();
+
+            using (SqlConnection dbConnection = new SqlConnection(_connectionString))
+            using (SqlCommand dbSelectCommand = new SqlCommand(@"SELECT	SchemaName = s.name,
+		TableName = t.name
+FROM	sys.tables t
+		JOIN sys.schemas s ON t.[schema_id] = s.[schema_id]
+WHERE t.[object_id] = @tableObjectId
+ORDER BY SchemaName, TableName;", dbConnection))
+            {
+                dbSelectCommand.CommandType = CommandType.Text;
+                dbSelectCommand.Parameters.AddWithValue("tableObjectId", tableObjectId);
+                dbConnection.Open();
+
+                using (SqlDataReader reader = dbSelectCommand.ExecuteReader())
+                {
+                    table.Load(reader);
+                }
+
+                dbConnection.Close();
+            }
+
+            return table;
+        }
+
+        public DataTable GetTables()
+        {
+            DataTable tables = new DataTable();
+
+            using (SqlConnection dbConnection = new SqlConnection(_connectionString))
+            using (SqlCommand dbSelectCommand = new SqlCommand(@"SELECT	TableObjectId = t.[object_id],
+		SchemaName = s.name,
+		TableName = t.name
+FROM	sys.tables t
+		JOIN sys.schemas s ON t.[schema_id] = s.[schema_id]
+ORDER BY SchemaName, TableName;", dbConnection))
+            {
+                dbSelectCommand.CommandType = CommandType.Text;
+                dbConnection.Open();
+
+                using (SqlDataReader reader = dbSelectCommand.ExecuteReader())
+                {
+                    tables.Load(reader);
+                }
+
+                dbConnection.Close();
+            }
+
+            return tables;
+        }
+
         public DataTable GetTableForeignKeyRelationshipReferencers(string schemaName, string tableName)
         {
             DataTable referencers = new DataTable();

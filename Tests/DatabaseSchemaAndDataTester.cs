@@ -15,7 +15,7 @@
         public void SelfReferencingTableForeignKeyRelationshipContainsCorrectSelfReferences()
         {
             TableForeignKeyRelationshipTreeSelfReferencingTableDatabase database = new TableForeignKeyRelationshipTreeSelfReferencingTableDatabase();
-            DatabaseSchemaAndData databaseSchemaAndData = new DatabaseSchemaAndData(null, (IDatabase)database);
+            DatabaseSchemaAndData databaseSchemaAndData = new DatabaseSchemaAndData(database);
 
             Assert.AreEqual(1, databaseSchemaAndData.GenerateTableForeignKeyRelationshipTree(database.Table).Count);
         }
@@ -40,6 +40,21 @@
 
 
             // Public methods
+
+            public DataTable GetStoredProcedures()
+            {
+                throw new NotImplementedException();
+            }
+
+            public DataTable GetTable(int tableObjectId)
+            {
+                throw new NotImplementedException();
+            }
+
+            public DataTable GetTables()
+            {
+                throw new NotImplementedException();
+            }
             
             public DataTable GetTableForeignKeyRelationshipReferencers(string schemaName, string tableName)
             {

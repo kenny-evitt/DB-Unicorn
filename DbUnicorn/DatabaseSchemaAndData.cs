@@ -10,12 +10,10 @@
 
     public class DatabaseSchemaAndData
     {
-        private readonly string _connectionString;
         private readonly IDatabase _database;
         
-        public DatabaseSchemaAndData(string connectionString, IDatabase database)
+        public DatabaseSchemaAndData(IDatabase database)
         {
-            _connectionString = connectionString;
             _database = database;
         }
 
@@ -24,41 +22,17 @@
 
         public List<StoredProcedure> GetStoredProcedures()
         {
-            List<StoredProcedure> storedProcedures = new List<StoredProcedure>();
-
-            using (SqlConnection dbConnection = new SqlConnection(_connectionString))
-            using (SqlCommand dbSelectCommand = new SqlCommand(@"SELECT	SchemaName = s.name,
-		ProcedureName = p.name,
-		ProcedureText = m.[definition],
-		ProcedureUsesAnsiNulls = m.uses_ansi_nulls,
-		ProcedureUsesQuotedIdentifiers = m.uses_quoted_identifier
-FROM	sys.procedures p
-		JOIN sys.schemas s ON p.[schema_id] = s.[schema_id]
-		JOIN sys.sql_modules m ON p.[object_id] = m.[object_id]
-ORDER BY SchemaName, ProcedureName;", dbConnection))
+            using (DataTable data = _database.GetStoredProcedures())
             {
-                dbSelectCommand.CommandType = CommandType.Text;
-                dbConnection.Open();
-
-                using (SqlDataReader reader = dbSelectCommand.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        storedProcedures.Add(
-                            new StoredProcedure(
-                                new Schema(
-                                    (string)reader["SchemaName"]),
-                                    (string)reader["ProcedureName"],
-                                    (string)reader["ProcedureText"],
-                                    (bool)reader["ProcedureUsesAnsiNulls"],
-                                    (bool)reader["ProcedureUsesQuotedIdentifiers"]));
-                    }
-                }
-
-                dbConnection.Close();
+                return (from row in data.AsEnumerable()
+                        select new StoredProcedure(
+                            new Schema((string)row["SchemaName"]),
+                            (string)row["ProcedureName"],
+                            (string)row["ProcedureText"],
+                            (bool)row["ProcedureUsesAnsiNulls"],
+                            (bool)row["ProcedureUsesQuotedIdentifiers"])
+                    ).ToList<StoredProcedure>();
             }
-
-            return storedProcedures;
         }
 
         /// <summary>
@@ -71,23 +45,19 @@ ORDER BY SchemaName, ProcedureName;", dbConnection))
         /// <returns></returns>
         public List<TableRelationship> GetTableForeignKeyRelationshipReferences(Table table, int tableReferenceLevel = 1)
         {
-            List<TableRelationship> references = new List<TableRelationship>();
-
             using (DataTable data = _database.GetTableForeignKeyRelationshipReferences(table.Schema.Name, table.Name))
             {
-                references = (from row in data.AsEnumerable()
-                              select new TableRelationship(
-                                  tableReferenceLevel,
-                                  table,
-                                  new Table(
-                                      (int)(row["ObjectId"]),
-                                      new Schema((string)(row["SchemaName"])),
-                                      (string)(row["ObjectName"]),
-                                      null))
-                            ).ToList<TableRelationship>();
+                return (from row in data.AsEnumerable()
+                        select new TableRelationship(
+                            tableReferenceLevel,
+                            table,
+                            new Table(
+                                (int)(row["ObjectId"]),
+                                new Schema((string)(row["SchemaName"])),
+                                (string)(row["ObjectName"]),
+                                null))
+                    ).ToList<TableRelationship>();
             }
-
-            return references;
         }
 
         /// <summary>
@@ -100,23 +70,19 @@ ORDER BY SchemaName, ProcedureName;", dbConnection))
         /// <returns></returns>
         public List<TableRelationship> GetTableForeignKeyRelationshipReferencers(Table table, int tableReferenceLevel = -1)
         {
-            List<TableRelationship> referencers = new List<TableRelationship>();
-
             using (DataTable data = _database.GetTableForeignKeyRelationshipReferencers(table.Schema.Name, table.Name))
             {
-                referencers = (from row in data.AsEnumerable()
-                               select new TableRelationship(
-                                   tableReferenceLevel,
-                                   table,
-                                   new Table(
-                                       (int)(row["ObjectId"]),
-                                       new Schema((string)(row["SchemaName"])),
-                                       (string)(row["ObjectName"]),
-                                       null))
-                            ).ToList<TableRelationship>();
+                return (from row in data.AsEnumerable()
+                        select new TableRelationship(
+                            tableReferenceLevel,
+                            table,
+                            new Table(
+                                (int)(row["ObjectId"]),
+                                new Schema((string)(row["SchemaName"])),
+                                (string)(row["ObjectName"]),
+                                null))
+                    ).ToList<TableRelationship>();
             }
-
-            return referencers;
         }
 
         /// <summary>
@@ -210,68 +176,42 @@ ORDER BY SchemaName, ProcedureName;", dbConnection))
 
         public Table GetTable(int tableObjectId)
         {
-            using (SqlConnection dbConnection = new SqlConnection(_connectionString))
-            using (SqlCommand dbSelectCommand = new SqlCommand(@"SELECT	SchemaName = s.name,
-		TableName = t.name
-FROM	sys.tables t
-		JOIN sys.schemas s ON t.[schema_id] = s.[schema_id]
-WHERE t.[object_id] = @tableObjectId
-ORDER BY SchemaName, TableName;", dbConnection))
+            using (DataTable data = _database.GetTable(tableObjectId))
             {
-                dbSelectCommand.CommandType = CommandType.Text;
-                dbSelectCommand.Parameters.AddWithValue("tableObjectId", tableObjectId);
-                dbConnection.Open();
-
-                using (SqlDataReader reader = dbSelectCommand.ExecuteReader())
+                if (data.Rows.Count == 0)
                 {
-                    if (reader.Read())
-                    {
-                        return new Table(
-                            tableObjectId,
-                            new Schema((string)reader["SchemaName"]),
-                            (string)reader["TableName"],
-                            null);
-                    }
+                    throw new ApplicationException(String.Format("No table found for object ID {0}", tableObjectId));
                 }
-
-                dbConnection.Close();
+                else if (data.Rows.Count == 1)
+                {
+                    return new Table(
+                        tableObjectId,
+                        new Schema((string)data.Rows[0]["SchemaName"]),
+                        (string)data.Rows[0]["TableName"],
+                        null);
+                }
+                else
+                {
+                    throw new ApplicationException(
+                        String.Format(
+                            "Multiple tables were found for object ID {0}!",
+                            tableObjectId));
+                }
             }
-
-            throw new ApplicationException(String.Format("No table found for object ID {0}", tableObjectId));
         }
 
         public List<Table> GetTables()
         {
-            List<Table> tables = new List<Table>();
-
-            using (SqlConnection dbConnection = new SqlConnection(_connectionString))
-            using (SqlCommand dbSelectCommand = new SqlCommand(@"SELECT	TableObjectId = t.[object_id],
-		SchemaName = s.name,
-		TableName = t.name
-FROM	sys.tables t
-		JOIN sys.schemas s ON t.[schema_id] = s.[schema_id]
-ORDER BY SchemaName, TableName;", dbConnection))
+            using (DataTable data = _database.GetTables())
             {
-                dbSelectCommand.CommandType = CommandType.Text;
-                dbConnection.Open();
-
-                using (SqlDataReader reader = dbSelectCommand.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        tables.Add(
-                            new Table(
-                                (int)reader["TableObjectId"],
-                                new Schema((string)reader["SchemaName"]),
-                                (string)reader["TableName"],
-                                null));
-                    }
-                }
-
-                dbConnection.Close();
+                return (from row in data.AsEnumerable()
+                        select new Table(
+                            (int)row["TableObjectId"],
+                            new Schema((string)row["SchemaName"]),
+                            (string)row["TableName"],
+                            null)
+                    ).ToList<Table>();
             }
-
-            return tables;
         }
     }
 }
