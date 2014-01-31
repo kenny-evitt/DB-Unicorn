@@ -20,5 +20,35 @@
 
             Assert.AreEqual(1, databaseSchemaAndData.GenerateTableForeignKeyRelationshipTree(database.Table).Count);
         }
+
+        [Test]
+        public void TableForeignKeyRelationshipTreeIncludesBackwardsReferences()
+        {
+            ForeignKeyRelationshipTreeDatabase database = new ForeignKeyRelationshipTreeDatabase();
+            DatabaseSchemaAndData databaseSchemaAndData = new DatabaseSchemaAndData(database);
+
+            Assert.Contains(
+                new TableRelationship(-1, database.BackwardReferenceTable, database.RootTable),
+                databaseSchemaAndData.GenerateTableForeignKeyRelationshipTree(database.RootTable));
+        }
+
+        [Test]
+        public void TableForeignKeyRelationshipReferencersAreCreatedCorrectly()
+        {
+            ForeignKeyRelationshipTreeDatabase database = new ForeignKeyRelationshipTreeDatabase();
+            DatabaseSchemaAndData databaseSchemaAndData = new DatabaseSchemaAndData(database);
+
+            Assert.AreEqual(
+                database.BackwardReferenceTable.Name,
+                databaseSchemaAndData.GetTableForeignKeyRelationshipReferencers(database.RootTable)[0].BaseTable.Name);
+
+            Assert.AreEqual(
+                database.BackwardReferenceTable,
+                databaseSchemaAndData.GetTableForeignKeyRelationshipReferencers(database.RootTable)[0].BaseTable);
+
+            Assert.AreEqual(
+                database.RootTable,
+                databaseSchemaAndData.GetTableForeignKeyRelationshipReferencers(database.RootTable)[0].ReferencedTable);
+        }
     }
 }
