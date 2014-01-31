@@ -37,11 +37,6 @@
             throw new NotImplementedException();
         }
 
-        public DataTable GetTables()
-        {
-            throw new NotImplementedException();
-        }
-
         public DataTable GetTableForeignKeyRelationshipReferencers(string schemaName, string tableName)
         {
             if (schemaName == _schemaName && tableName == _tableName)
@@ -72,6 +67,11 @@
                         _schemaName,
                         _tableName));
             }
+        }
+
+        public DataTable GetTables()
+        {
+            throw new NotImplementedException();
         }
 
 
