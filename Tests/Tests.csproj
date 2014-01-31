@@ -47,7 +47,9 @@
     <Compile Include="ScriptingHelpersTester.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestDatabases\DatabaseHelper.cs" />
+    <Compile Include="TestDatabases\ForeignKeyRelationshipTreeDatabase.cs" />
     <Compile Include="TestDatabases\SelfReferencingTableDatabase.cs" />
+    <Compile Include="TestDatabaseTester.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
