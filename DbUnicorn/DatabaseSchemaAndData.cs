@@ -75,12 +75,12 @@
                 return (from row in data.AsEnumerable()
                         select new TableRelationship(
                             tableReferenceLevel,
-                            table,
                             new Table(
                                 (int)(row["ObjectId"]),
                                 new Schema((string)(row["SchemaName"])),
                                 (string)(row["ObjectName"]),
-                                null))
+                                null),
+                            table)
                     ).ToList<TableRelationship>();
             }
         }
@@ -99,7 +99,7 @@
             // Determine all of the 'forward' references, i.e. the tree of objects that *are referenced by* the given object.
 
             int currentReferenceLevel = 1;
-            List<TableRelationship> currentLevelReferences = GetTableForeignKeyRelationshipReferences(table);
+            List<TableRelationship> currentLevelReferences = this.GetTableForeignKeyRelationshipReferences(table);
             List<TableRelationship> nextLevelReferences = new List<TableRelationship>();
 
             do
@@ -114,7 +114,7 @@
                         && (!relationshipTree.Exists(x => x.ReferencedTable.Schema.Name == reference.ReferencedTable.Schema.Name && x.ReferencedTable.Name == reference.ReferencedTable.Name))
                         && (!nextLevelReferences.Exists(x => x.BaseTable.Schema.Name == reference.ReferencedTable.Schema.Name && x.BaseTable.Name == reference.ReferencedTable.Name)))
                     {
-                        nextLevelReferences.AddRange(GetTableForeignKeyRelationshipReferences(reference.ReferencedTable, currentReferenceLevel + 1));
+                        nextLevelReferences.AddRange(this.GetTableForeignKeyRelationshipReferences(reference.ReferencedTable, currentReferenceLevel + 1));
                     }
                 }
 
@@ -129,7 +129,7 @@
 
             List<TableRelationship> backwardReferences = new List<TableRelationship>();
             currentReferenceLevel = -1;
-            currentLevelReferences = GetTableForeignKeyRelationshipReferencers(table);
+            currentLevelReferences = this.GetTableForeignKeyRelationshipReferencers(table);
 
             // Remove self-references, as they're already covered by 'forward references'.
             currentLevelReferences.RemoveAll(r => table.Schema.Name == r.BaseTable.Schema.Name && table.Name == r.BaseTable.Name);
@@ -146,7 +146,7 @@
                     if ((!backwardReferences.Exists(x => x.BaseTable.Schema.Name == reference.BaseTable.Schema.Name && x.BaseTable.Name == reference.BaseTable.Name))
                         && (!nextLevelReferences.Exists(x => x.ReferencedTable.Schema.Name == reference.BaseTable.Schema.Name && x.ReferencedTable.Name == reference.BaseTable.Name)))
                     {
-                        nextLevelReferences.AddRange(GetTableForeignKeyRelationshipReferencers(reference.BaseTable, currentReferenceLevel - 1));
+                        nextLevelReferences.AddRange(this.GetTableForeignKeyRelationshipReferencers(reference.BaseTable, currentReferenceLevel - 1));
                     }
                 }
 
@@ -171,7 +171,7 @@
         {
             Table table = this.GetTable(tableObjectId);
             
-            return table.GenerateForeignKeyRelationshipsAsDot(GenerateTableForeignKeyRelationshipTree(table));
+            return table.GenerateForeignKeyRelationshipsAsDot(this.GenerateTableForeignKeyRelationshipTree(table));
         }
 
         public Table GetTable(int tableObjectId)

@@ -46,6 +46,28 @@
         }
 
 
+        // Operators
+
+        public static bool operator ==(TableRelationship tableRelationship1, TableRelationship tableRelationship2)
+        {
+            if (System.Object.ReferenceEquals(tableRelationship1, tableRelationship2))
+                return true;
+
+            if (((object)tableRelationship1 == null) || ((object)tableRelationship2 == null))
+                return false;
+
+            return
+                tableRelationship1._level == tableRelationship2._level
+                && tableRelationship1._baseTable == tableRelationship2._baseTable
+                && tableRelationship1._referencedTable == tableRelationship2._referencedTable;
+        }
+
+        public static bool operator !=(TableRelationship tableRelationship1, TableRelationship tableRelationship2)
+        {
+            return !(tableRelationship1 == tableRelationship2);
+        }
+
+
         // Public methods
 
         public override bool Equals(object obj)
@@ -55,7 +77,10 @@
 
         public bool Equals(TableRelationship other)
         {
-            return _level == other.Level && _baseTable == other.BaseTable && _referencedTable == other.ReferencedTable;
+            if ((object)other == null)
+                return false;
+            
+            return _level == other.Level && _baseTable.Equals(other._baseTable) && _referencedTable.Equals(other._referencedTable);
         }
 
         public override int GetHashCode()

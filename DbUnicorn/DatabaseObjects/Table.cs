@@ -61,6 +61,25 @@
         }
 
 
+        // Operators
+
+        public static bool operator ==(Table table1, Table table2)
+        {
+            if (System.Object.ReferenceEquals(table1, table2))
+                return true;
+
+            if (((object)table1 == null) || ((object)table2 == null))
+                return false;
+
+            return table1._schema == table2._schema && table1._name == table2._name && table1._objectId == table2._objectId;
+        }
+
+        public static bool operator !=(Table table1, Table table2)
+        {
+            return !(table1 == table2);
+        }
+
+        
         // Public methods
 
         public override bool Equals(object obj)
@@ -70,7 +89,10 @@
 
         public bool Equals(Table other)
         {
-            return _schema == other.Schema && _name == other.Name && _objectId == other.ObjectId;
+            if ((object)other == null)
+                return false;
+            
+            return _schema.Equals(other._schema) && _name == other._name && _objectId == other._objectId;
         }
 
 
