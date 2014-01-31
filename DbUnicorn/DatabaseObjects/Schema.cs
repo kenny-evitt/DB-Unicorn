@@ -29,6 +29,25 @@
         }
 
 
+        // Operators
+
+        public static bool operator ==(Schema schema1, Schema schema2)
+        {
+            if (System.Object.ReferenceEquals(schema1, schema2))
+                return true;
+
+            if (((object)schema1 == null) || ((object)schema2 == null))
+                return false;
+
+            return schema1._name == schema2._name;
+        }
+
+        public static bool operator !=(Schema schema1, Schema schema2)
+        {
+            return !(schema1 == schema2);
+        }
+        
+        
         // Public methods
 
         public override bool Equals(object obj)
@@ -38,7 +57,10 @@
         
         public bool Equals(Schema other)
         {
-            return _name == other.Name;
+            if ((object)other == null)
+                return false;
+            
+            return _name == other._name;
         }
         
         public static IEqualityComparer<Schema> GetEqualityComparer()
