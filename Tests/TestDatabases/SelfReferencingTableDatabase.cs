@@ -79,28 +79,7 @@
 
         private DataTable GenerateSelfReferenceRelationshipDataTable()
         {
-            DataTable table = new DataTable();
-
-            table.Columns.Add(
-                new DataColumn()
-                {
-                    DataType = Type.GetType("System.Int32"),
-                    ColumnName = "ObjectId"
-                });
-
-            table.Columns.Add(
-                new DataColumn()
-                {
-                    DataType = Type.GetType("System.String"),
-                    ColumnName = "SchemaName"
-                });
-
-            table.Columns.Add(
-                new DataColumn()
-                {
-                    DataType = Type.GetType("System.String"),
-                    ColumnName = "ObjectName"
-                });
+            DataTable table = DatabaseHelper.GetTableRelationshipDataTable();
 
             DataRow row;
 
