@@ -171,7 +171,7 @@
         {
             Table table = this.GetTable(tableObjectId);
             
-            return table.GenerateForeignKeyRelationshipsAsDot(GenerateTableForeignKeyRelationshipTree(table));
+            return table.GenerateForeignKeyRelationshipsAsDot(this.GenerateTableForeignKeyRelationshipTree(table));
         }
 
         public Table GetTable(int tableObjectId)
