@@ -75,12 +75,12 @@
                 return (from row in data.AsEnumerable()
                         select new TableRelationship(
                             tableReferenceLevel,
-                            table,
                             new Table(
                                 (int)(row["ObjectId"]),
                                 new Schema((string)(row["SchemaName"])),
                                 (string)(row["ObjectName"]),
-                                null))
+                                null),
+                            table)
                     ).ToList<TableRelationship>();
             }
         }
