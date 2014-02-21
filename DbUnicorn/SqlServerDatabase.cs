@@ -20,6 +20,20 @@
 
         // Public methods
 
+        public void ExecuteSql(string sql)
+        {
+            using (SqlConnection dbConnection = new SqlConnection(_connectionString))
+            using (SqlCommand dbSqlCommand = new SqlCommand(sql, dbConnection))
+            {
+                dbSqlCommand.CommandType = CommandType.Text;
+                dbConnection.Open();
+
+                dbSqlCommand.ExecuteNonQuery();
+
+                dbConnection.Close();
+            }
+        }
+
         public DataTable GetStoredProcedures()
         {
             DataTable storedProcedures = new DataTable();

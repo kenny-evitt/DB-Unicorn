@@ -38,6 +38,11 @@
         
         // Public methods
 
+        public void ExecuteSql(string sql)
+        {
+            throw new NotImplementedException();
+        }
+
         public DataTable GetStoredProcedures()
         {
             throw new NotImplementedException();

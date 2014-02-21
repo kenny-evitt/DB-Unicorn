@@ -4,6 +4,7 @@
 
     public interface IDatabase
     {
+        void ExecuteSql(string sql);
         DataTable GetStoredProcedures();
         DataTable GetTable(int tableObjectId);
         DataTable GetTableForeignKeyRelationshipReferencers(string schemaName, string tableName);
