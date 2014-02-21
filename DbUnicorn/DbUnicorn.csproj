@@ -43,6 +43,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DatabaseCreator.cs" />
     <Compile Include="DatabaseObjects\IDatabaseObject.cs" />
     <Compile Include="DatabaseObjects\Schema.cs" />
     <Compile Include="DatabaseObjects\ScriptingHelpers.cs" />
