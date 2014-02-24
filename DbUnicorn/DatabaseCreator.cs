@@ -55,29 +55,9 @@
 
         private IEnumerable<string> GetScriptBatches(string scriptFilePath)
         {
-            string[] scriptLines = File.ReadAllLines(scriptFilePath);
-
-            // TODO: Replace the following code with the new method in the Transact-SQL Helpers
-            // library.
-
-            List<string> batches = new List<string>();
-
-            StringBuilder nextBatch = new StringBuilder();
-
-            foreach (string line in scriptLines)
-            {
-                if (line.Trim().StartsWith("GO", System.StringComparison.InvariantCultureIgnoreCase))
-                {
-                    batches.Add(nextBatch.ToString());
-                    nextBatch.Clear();
-                }
-                else
-                {
-                    nextBatch.AppendLine(line);
-                }
-            }
-
-            return batches;
+            return
+                TransactSqlHelpers.Scripts.GetBatches(
+                    File.ReadAllLines(scriptFilePath));
         }
     }
 }
