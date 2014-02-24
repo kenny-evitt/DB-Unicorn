@@ -1,5 +1,6 @@
 ﻿namespace DbUnicorn
 {
+    using System;
     using System.Data;
     using System.Data.SqlClient;
 
@@ -28,7 +29,16 @@
                 dbSqlCommand.CommandType = CommandType.Text;
                 dbConnection.Open();
 
-                dbSqlCommand.ExecuteNonQuery();
+                try
+                {
+                    dbSqlCommand.ExecuteNonQuery();
+                }
+                catch (SqlException ex)
+                {
+                    throw new ApplicationException(
+                        String.Format("Exception executing SQL query \"{0}\"", sql),
+                        ex);
+                }
 
                 dbConnection.Close();
             }
