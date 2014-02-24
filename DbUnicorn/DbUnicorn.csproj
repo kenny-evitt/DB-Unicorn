@@ -38,8 +38,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="TransactSqlHelpers">
-      <HintPath>..\packages\TransactSqlHelpers.1.0.3\lib\net40\TransactSqlHelpers.dll</HintPath>
+    <Reference Include="TransactSqlHelpers, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\TransactSqlHelpers.1.0.7\lib\net40\TransactSqlHelpers.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
