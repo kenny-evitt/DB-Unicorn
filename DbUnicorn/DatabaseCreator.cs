@@ -22,42 +22,21 @@
         {
             string schemaScriptsFolderPath = Path.Combine(_scriptsRootFolderPath, "Schemas");
 
-            this.ExecuteScripts(schemaScriptsFolderPath);
+            ScriptExecutor.ExecuteScriptsInFolder(schemaScriptsFolderPath, _targetDatabase);
         }
 
         public void CreateTables()
         {
             string tableScriptsFolderPath = Path.Combine(_scriptsRootFolderPath, "Tables");
 
-            this.ExecuteScripts(tableScriptsFolderPath);
+            ScriptExecutor.ExecuteScriptsInFolder(tableScriptsFolderPath, _targetDatabase);
         }
 
         public void CreateUserDefinedDataTypes()
         {
             string userDefinedDataTypeScriptsFolderPath = Path.Combine(_scriptsRootFolderPath, "User Defined Data Types");
 
-            this.ExecuteScripts(userDefinedDataTypeScriptsFolderPath);
-        }
-
-
-        // Private methods
-
-        private void ExecuteScripts(string folderPath)
-        {
-            foreach (string fileName in Directory.EnumerateFiles(folderPath, "*.sql"))
-            {
-                foreach (string batch in this.GetScriptBatches(Path.Combine(folderPath, fileName)))
-                {
-                    _targetDatabase.ExecuteSql(batch);
-                }
-            }
-        }
-
-        private IEnumerable<string> GetScriptBatches(string scriptFilePath)
-        {
-            return
-                TransactSqlHelpers.Scripts.GetBatches(
-                    File.ReadAllLines(scriptFilePath));
+            ScriptExecutor.ExecuteScriptsInFolder(userDefinedDataTypeScriptsFolderPath, _targetDatabase);
         }
     }
 }
