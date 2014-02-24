@@ -38,7 +38,7 @@
         
         // Public methods
 
-        public void ExecuteSql(string sql)
+        public void ExecuteSqlBatch(string sql)
         {
             throw new NotImplementedException();
         }

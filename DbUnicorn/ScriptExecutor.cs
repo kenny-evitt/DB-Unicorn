@@ -11,7 +11,7 @@
             {
                 foreach (string batch in ScriptExecutor.GetScriptBatches(Path.Combine(folderPath, fileName)))
                 {
-                    targetDatabase.ExecuteSql(batch);
+                    targetDatabase.ExecuteSqlBatch(batch);
                 }
             }
         }

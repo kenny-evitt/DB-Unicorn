@@ -21,7 +21,7 @@
 
         // Public methods
 
-        public void ExecuteSql(string sql)
+        public void ExecuteSqlBatch(string sql)
         {
             using (SqlConnection dbConnection = new SqlConnection(_connectionString))
             using (SqlCommand dbSqlCommand = new SqlCommand(sql, dbConnection))
