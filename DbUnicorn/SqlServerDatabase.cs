@@ -21,10 +21,12 @@
 
         // Public methods
 
-        public void ExecuteSqlBatch(string sql)
+        public SqlBatchExecution ExecuteSqlBatch(string sqlBatch)
         {
+            SqlBatchExecution execution = new SqlBatchExecution(sqlBatch);
+            
             using (SqlConnection dbConnection = new SqlConnection(_connectionString))
-            using (SqlCommand dbSqlCommand = new SqlCommand(sql, dbConnection))
+            using (SqlCommand dbSqlCommand = new SqlCommand(sqlBatch, dbConnection))
             {
                 dbSqlCommand.CommandType = CommandType.Text;
                 dbConnection.Open();
@@ -35,13 +37,13 @@
                 }
                 catch (SqlException ex)
                 {
-                    throw new ApplicationException(
-                        String.Format("Exception executing SQL query \"{0}\"", sql),
-                        ex);
+                    execution.SqlException = ex;
                 }
 
                 dbConnection.Close();
             }
+
+            return execution;
         }
 
         public DataTable GetStoredProcedures()

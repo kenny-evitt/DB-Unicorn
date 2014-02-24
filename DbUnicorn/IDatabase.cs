@@ -4,7 +4,7 @@
 
     public interface IDatabase
     {
-        void ExecuteSqlBatch(string sql);
+        SqlBatchExecution ExecuteSqlBatch(string sql);
         DataTable GetStoredProcedures();
         DataTable GetTable(int tableObjectId);
         DataTable GetTableForeignKeyRelationshipReferencers(string schemaName, string tableName);
