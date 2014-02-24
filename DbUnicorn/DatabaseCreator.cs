@@ -17,26 +17,26 @@
 
 
         // Public methods
-        
-        public void CreateSchemas()
+
+        public IEnumerable<SqlBatchExecution> CreateSchemas()
         {
             string schemaScriptsFolderPath = Path.Combine(_scriptsRootFolderPath, "Schemas");
 
-            ScriptExecutor.ExecuteScriptsInFolder(schemaScriptsFolderPath, _targetDatabase);
+            return ScriptExecutor.ExecuteScriptsInFolder(schemaScriptsFolderPath, _targetDatabase);
         }
 
-        public void CreateTables()
+        public IEnumerable<SqlBatchExecution> CreateTables()
         {
             string tableScriptsFolderPath = Path.Combine(_scriptsRootFolderPath, "Tables");
 
-            ScriptExecutor.ExecuteScriptsInFolder(tableScriptsFolderPath, _targetDatabase);
+            return ScriptExecutor.ExecuteScriptsInFolder(tableScriptsFolderPath, _targetDatabase);
         }
 
-        public void CreateUserDefinedDataTypes()
+        public IEnumerable<SqlBatchExecution> CreateUserDefinedDataTypes()
         {
             string userDefinedDataTypeScriptsFolderPath = Path.Combine(_scriptsRootFolderPath, "User Defined Data Types");
 
-            ScriptExecutor.ExecuteScriptsInFolder(userDefinedDataTypeScriptsFolderPath, _targetDatabase);
+            return ScriptExecutor.ExecuteScriptsInFolder(userDefinedDataTypeScriptsFolderPath, _targetDatabase);
         }
     }
 }
