@@ -38,6 +38,11 @@
         
         // Public methods
 
+        public SqlBatchExecution ExecuteSqlBatch(string sql)
+        {
+            throw new NotImplementedException();
+        }
+
         public DataTable GetStoredProcedures()
         {
             throw new NotImplementedException();

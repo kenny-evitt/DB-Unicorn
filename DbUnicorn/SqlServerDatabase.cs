@@ -1,5 +1,6 @@
 ﻿namespace DbUnicorn
 {
+    using System;
     using System.Data;
     using System.Data.SqlClient;
 
@@ -19,6 +20,31 @@
 
 
         // Public methods
+
+        public SqlBatchExecution ExecuteSqlBatch(string sqlBatch)
+        {
+            SqlBatchExecution execution = new SqlBatchExecution(sqlBatch);
+            
+            using (SqlConnection dbConnection = new SqlConnection(_connectionString))
+            using (SqlCommand dbSqlCommand = new SqlCommand(sqlBatch, dbConnection))
+            {
+                dbSqlCommand.CommandType = CommandType.Text;
+                dbConnection.Open();
+
+                try
+                {
+                    dbSqlCommand.ExecuteNonQuery();
+                }
+                catch (SqlException ex)
+                {
+                    execution.SqlException = ex;
+                }
+
+                dbConnection.Close();
+            }
+
+            return execution;
+        }
 
         public DataTable GetStoredProcedures()
         {
