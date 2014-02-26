@@ -6,18 +6,32 @@
 
     public class DatabaseCreator
     {
+        // Private fields
+
         private readonly string _scriptsRootFolderPath;
-        private readonly IDatabase _targetDatabase;
+        private readonly IDatabaseServer _targetDatabaseServer;
+
+        private IDatabase _targetDatabase;
         
-        public DatabaseCreator(string scriptsRootFolderPath, IDatabase targetDatabase)
+
+        // Constructor
+
+        public DatabaseCreator(string scriptsRootFolderPath, IDatabaseServer targetDatabaseServer)
         {
             _scriptsRootFolderPath = scriptsRootFolderPath;
-            _targetDatabase = targetDatabase;
+            _targetDatabaseServer = targetDatabaseServer;
         }
 
 
         // Public methods
 
+        public IDatabase CreateDatabase(string databaseName)
+        {
+            _targetDatabase = _targetDatabaseServer.CreateDatabase(databaseName);
+
+            return _targetDatabase;
+        }
+        
         public IEnumerable<SqlBatchExecution> CreateSchemas()
         {
             string schemaScriptsFolderPath = Path.Combine(_scriptsRootFolderPath, "Schemas");
