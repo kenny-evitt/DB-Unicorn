@@ -23,18 +23,34 @@
             }
         }
 
+
+        // Private methods
+
         private static void CreateDatabase(string serverInstanceName, string databaseName, string scriptsRootFolderPath)
         {
-            DatabaseCreator dbCreator =
-                new DatabaseCreator(
-                    scriptsRootFolderPath,
-                    new SqlServerDatabaseServer(serverInstanceName));
+            IDatabaseServer server = Program.GetServer("sql-server", serverInstanceName);
 
-            IDatabase targetDatabase = dbCreator.CreateDatabase(databaseName);
+            IDatabase targetDatabase = server.CreateDatabase(databaseName);
 
-            dbCreator.CreateSchemas();
-            dbCreator.CreateUserDefinedDataTypes();
-            dbCreator.CreateTables();
+            targetDatabase.CreateObjectsFromScripts(scriptsRootFolderPath);
+        }
+
+        private static IDatabaseServer GetServer(string serverType, string serverInstanceName)
+        {
+            IDatabaseServer server;
+
+            switch (serverType)
+            {
+                case "sql-server":
+                    server = new SqlServerDatabaseServer(serverInstanceName);
+                    break;
+
+                default:
+                    throw new ArgumentException(
+                        String.Format("Server type '{0}' is not supported.", serverType));
+            }
+
+            return server;
         }
     }
 }

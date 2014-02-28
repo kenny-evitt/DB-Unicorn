@@ -27,6 +27,11 @@
 
         // Public methods
 
+        public void CreateObjectsFromScripts(string scriptsRootFolderPath)
+        {
+            throw new NotImplementedException();
+        }
+        
         public void ExecuteSqlBatch(string sql)
         {
             throw new NotImplementedException();

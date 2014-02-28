@@ -1,8 +1,10 @@
 ﻿namespace DbUnicorn
 {
     using System;
+    using System.Collections.Generic;
     using System.Data;
     using System.Data.SqlClient;
+    using System.IO;
 
     public class SqlServerDatabase : IDatabase
     {
@@ -20,6 +22,22 @@
 
 
         // Public methods
+
+        public void CreateObjectsFromScripts(string scriptsRootFolderPath)
+        {
+            List<string> objectScriptFolderNames = new List<string>
+            {
+                "Schemas",
+                "User Defined Data Types",
+                "Tables"
+            };
+
+            foreach (string folderName in objectScriptFolderNames)
+            {
+                string folderPath = Path.Combine(scriptsRootFolderPath, folderName);
+                SqlServerScriptExecutor.ExecuteScriptsInFolder(scriptsRootFolderPath, this);
+            }
+        }
 
         public void ExecuteSqlBatch(string sqlBatch)
         {

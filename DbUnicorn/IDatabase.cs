@@ -4,7 +4,10 @@
 
     public interface IDatabase
     {
+        void CreateObjectsFromScripts(string scriptsRootFolderPath);
+
         void ExecuteSqlBatch(string sql);
+
         DataTable GetStoredProcedures();
         DataTable GetTable(int tableObjectId);
         DataTable GetTableForeignKeyRelationshipReferencers(string schemaName, string tableName);
