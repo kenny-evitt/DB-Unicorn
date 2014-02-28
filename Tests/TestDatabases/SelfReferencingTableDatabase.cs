@@ -27,7 +27,7 @@
 
         // Public methods
 
-        public SqlBatchExecution ExecuteSqlBatch(string sql)
+        public void ExecuteSqlBatch(string sql)
         {
             throw new NotImplementedException();
         }

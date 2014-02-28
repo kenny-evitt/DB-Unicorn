@@ -56,7 +56,6 @@
     <Compile Include="IDatabaseServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScriptExecutor.cs" />
-    <Compile Include="SqlBatchExecution.cs" />
     <Compile Include="SqlServerDatabase.cs" />
     <Compile Include="SqlServerDatabaseServer.cs" />
     <Compile Include="TableData.cs" />

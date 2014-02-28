@@ -32,11 +32,9 @@
 
             IDatabase targetDatabase = dbCreator.CreateDatabase(databaseName);
 
-            List<SqlBatchExecution> batchExecutions = new List<SqlBatchExecution>();
-
-            batchExecutions.AddRange(dbCreator.CreateSchemas());
-            batchExecutions.AddRange(dbCreator.CreateUserDefinedDataTypes());
-            batchExecutions.AddRange(dbCreator.CreateTables());
+            dbCreator.CreateSchemas();
+            dbCreator.CreateUserDefinedDataTypes();
+            dbCreator.CreateTables();
         }
     }
 }

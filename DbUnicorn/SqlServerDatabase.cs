@@ -21,10 +21,8 @@
 
         // Public methods
 
-        public SqlBatchExecution ExecuteSqlBatch(string sqlBatch)
+        public void ExecuteSqlBatch(string sqlBatch)
         {
-            SqlBatchExecution execution = new SqlBatchExecution(sqlBatch);
-            
             using (SqlConnection dbConnection = new SqlConnection(_connectionString))
             using (SqlCommand dbSqlCommand = new SqlCommand(sqlBatch, dbConnection))
             {
@@ -37,13 +35,11 @@
                 }
                 catch (SqlException ex)
                 {
-                    execution.SqlException = ex;
+                    
                 }
 
                 dbConnection.Close();
             }
-
-            return execution;
         }
 
         public DataTable GetStoredProcedures()

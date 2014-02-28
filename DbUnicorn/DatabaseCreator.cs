@@ -32,25 +32,25 @@
             return _targetDatabase;
         }
         
-        public IEnumerable<SqlBatchExecution> CreateSchemas()
+        public void CreateSchemas()
         {
             string schemaScriptsFolderPath = Path.Combine(_scriptsRootFolderPath, "Schemas");
 
-            return ScriptExecutor.ExecuteScriptsInFolder(schemaScriptsFolderPath, _targetDatabase);
+            ScriptExecutor.ExecuteScriptsInFolder(schemaScriptsFolderPath, _targetDatabase);
         }
 
-        public IEnumerable<SqlBatchExecution> CreateTables()
+        public void CreateTables()
         {
             string tableScriptsFolderPath = Path.Combine(_scriptsRootFolderPath, "Tables");
 
-            return ScriptExecutor.ExecuteScriptsInFolder(tableScriptsFolderPath, _targetDatabase);
+            ScriptExecutor.ExecuteScriptsInFolder(tableScriptsFolderPath, _targetDatabase);
         }
 
-        public IEnumerable<SqlBatchExecution> CreateUserDefinedDataTypes()
+        public void CreateUserDefinedDataTypes()
         {
             string userDefinedDataTypeScriptsFolderPath = Path.Combine(_scriptsRootFolderPath, "User Defined Data Types");
 
-            return ScriptExecutor.ExecuteScriptsInFolder(userDefinedDataTypeScriptsFolderPath, _targetDatabase);
+            ScriptExecutor.ExecuteScriptsInFolder(userDefinedDataTypeScriptsFolderPath, _targetDatabase);
         }
     }
 }
