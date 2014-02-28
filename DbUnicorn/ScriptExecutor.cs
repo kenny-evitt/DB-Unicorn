@@ -2,6 +2,9 @@
 {
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
+
+    using TransactSqlHelpers;
 
     public static class ScriptExecutor
     {
@@ -23,9 +26,13 @@
 
         private static IEnumerable<string> GetScriptBatches(string scriptFilePath)
         {
-            return
-                TransactSqlHelpers.Scripts.GetBatches(
+            IEnumerable<Batch> batches =
+                Scripts.GetBatches(
                     File.ReadAllLines(scriptFilePath));
+
+            return
+                (from Batch batch in batches
+                 select batch.Sql);
         }
     }
 }
