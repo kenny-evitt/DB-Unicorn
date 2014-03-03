@@ -23,7 +23,7 @@
 
         // Public methods
 
-        public void CreateObjectsFromScripts(string scriptsRootFolderPath)
+        public List<SqlServerScript> CreateObjectsFromScripts(string scriptsRootFolderPath)
         {
             List<string> objectScriptFolderNames = new List<string>
             {
@@ -32,17 +32,23 @@
                 "Tables"
             };
 
+            List<SqlServerScript> scripts = new List<SqlServerScript>();
+
             foreach (string folderName in objectScriptFolderNames)
             {
                 string folderPath = Path.Combine(scriptsRootFolderPath, folderName);
-                SqlServerScriptExecutor.ExecuteScriptsInFolder(scriptsRootFolderPath, this);
+                scripts.AddRange(SqlServerScriptExecutor.ExecuteScriptsInFolder(folderPath, this));
             }
+
+            return scripts;
         }
 
-        public void ExecuteSqlBatch(string sqlBatch)
+        public SqlBatchExecution ExecuteSqlBatch(ISqlBatch sqlBatch)
         {
+            SqlBatchExecution execution = new SqlBatchExecution();
+            
             using (SqlConnection dbConnection = new SqlConnection(_connectionString))
-            using (SqlCommand dbSqlCommand = new SqlCommand(sqlBatch, dbConnection))
+            using (SqlCommand dbSqlCommand = new SqlCommand(sqlBatch.Sql, dbConnection))
             {
                 dbSqlCommand.CommandType = CommandType.Text;
                 dbConnection.Open();
@@ -53,11 +59,15 @@
                 }
                 catch (SqlException ex)
                 {
-                    
+                    execution.Exception = ex;
                 }
 
                 dbConnection.Close();
             }
+
+            sqlBatch.Executions.Add(execution);
+
+            return execution;
         }
 
         public DataTable GetStoredProcedures()

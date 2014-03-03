@@ -1,12 +1,13 @@
 ﻿namespace DbUnicorn
 {
+    using System.Collections.Generic;
     using System.Data;
 
     public interface IDatabase
     {
-        void CreateObjectsFromScripts(string scriptsRootFolderPath);
+        List<SqlServerScript> CreateObjectsFromScripts(string scriptsRootFolderPath);
 
-        void ExecuteSqlBatch(string sql);
+        SqlBatchExecution ExecuteSqlBatch(ISqlBatch sqlBatch);
 
         DataTable GetStoredProcedures();
         DataTable GetTable(int tableObjectId);
