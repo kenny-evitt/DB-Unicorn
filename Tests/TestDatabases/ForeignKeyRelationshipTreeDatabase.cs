@@ -5,8 +5,8 @@
 
     using DbUnicorn;
     using DbUnicorn.DatabaseObjects;
-    
-    public class ForeignKeyRelationshipTreeDatabase : IDatabase
+
+    public class ForeignKeyRelationshipTreeDatabase : TestDatabase
     {
         // Private fields
 
@@ -38,27 +38,7 @@
 
         // Public methods
 
-        public void CreateObjectsFromScripts(string scriptsRootFolderPath)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ExecuteSqlBatch(string sql)
-        {
-            throw new NotImplementedException();
-        }
-
-        public DataTable GetStoredProcedures()
-        {
-            throw new NotImplementedException();
-        }
-
-        public DataTable GetTable(int tableObjectId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public DataTable GetTableForeignKeyRelationshipReferencers(string schemaName, string tableName)
+        new public DataTable GetTableForeignKeyRelationshipReferencers(string schemaName, string tableName)
         {
             if (schemaName == _schemaName && tableName == _rootTableName)
             {
@@ -79,7 +59,7 @@
             }
         }
 
-        public DataTable GetTableForeignKeyRelationshipReferences(string schemaName, string tableName)
+        new public DataTable GetTableForeignKeyRelationshipReferences(string schemaName, string tableName)
         {
             if (schemaName == _schemaName && tableName == _rootTableName)
             {
@@ -98,11 +78,6 @@
             {
                 return new DataTable();
             }
-        }
-
-        public DataTable GetTables()
-        {
-            throw new NotImplementedException();
         }
     }
 }

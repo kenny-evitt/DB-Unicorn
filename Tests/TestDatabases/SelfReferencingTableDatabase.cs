@@ -6,7 +6,7 @@
     using DbUnicorn;
     using DbUnicorn.DatabaseObjects;
 
-    public class SelfReferencingTableDatabase : IDatabase
+    public class SelfReferencingTableDatabase : TestDatabase
     {
         // Private fields
 
@@ -27,27 +27,7 @@
 
         // Public methods
 
-        public void CreateObjectsFromScripts(string scriptsRootFolderPath)
-        {
-            throw new NotImplementedException();
-        }
-        
-        public void ExecuteSqlBatch(string sql)
-        {
-            throw new NotImplementedException();
-        }
-
-        public DataTable GetStoredProcedures()
-        {
-            throw new NotImplementedException();
-        }
-
-        public DataTable GetTable(int tableObjectId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public DataTable GetTableForeignKeyRelationshipReferencers(string schemaName, string tableName)
+        new public DataTable GetTableForeignKeyRelationshipReferencers(string schemaName, string tableName)
         {
             if (schemaName == _schemaName && tableName == _tableName)
             {
@@ -63,7 +43,7 @@
             }
         }
 
-        public DataTable GetTableForeignKeyRelationshipReferences(string schemaName, string tableName)
+        new public DataTable GetTableForeignKeyRelationshipReferences(string schemaName, string tableName)
         {
             if (schemaName == _schemaName && tableName == _tableName)
             {
@@ -77,11 +57,6 @@
                         _schemaName,
                         _tableName));
             }
-        }
-
-        public DataTable GetTables()
-        {
-            throw new NotImplementedException();
         }
 
 
