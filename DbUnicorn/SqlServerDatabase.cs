@@ -25,20 +25,11 @@
 
         public List<SqlServerScript> CreateObjectsFromScripts(string scriptsRootFolderPath)
         {
-            List<string> objectScriptFolderNames = new List<string>
-            {
-                "Schemas",
-                "User Defined Data Types",
-                "Tables"
-            };
-
             List<SqlServerScript> scripts = new List<SqlServerScript>();
 
-            foreach (string folderName in objectScriptFolderNames)
-            {
-                string folderPath = Path.Combine(scriptsRootFolderPath, folderName);
-                scripts.AddRange(SqlServerScriptExecutor.ExecuteScriptsInFolder(folderPath, this));
-            }
+            scripts.AddRange(this.CreateSchemasFromScripts(scriptsRootFolderPath));
+            scripts.AddRange(this.CreateUserDefinedDataTypesFromScripts(scriptsRootFolderPath));
+            scripts.AddRange(this.CreateTablesFromScripts(scriptsRootFolderPath));
 
             return scripts;
         }
@@ -214,6 +205,30 @@ WHERE	o_parent_schema.[name] = @objectSchemaName
             }
 
             return references;
+        }
+
+
+        // Private methods
+
+        private List<SqlServerScript> CreateSchemasFromScripts(string scriptsRootFolderPath)
+        {
+            string schemasScriptsFolderPath = Path.Combine(scriptsRootFolderPath, "Schemas");
+
+            return SqlServerScriptExecutor.ExecuteScriptsInFolder(schemasScriptsFolderPath, this, 0);
+        }
+        
+        private List<SqlServerScript> CreateTablesFromScripts(string scriptsRootFolderPath)
+        {
+            string tableScriptsFolderPath = Path.Combine(scriptsRootFolderPath, "Tables");
+            
+            return SqlServerScriptExecutor.ExecuteScriptsInFolder(tableScriptsFolderPath, this, 1);
+        }
+
+        private List<SqlServerScript> CreateUserDefinedDataTypesFromScripts(string scriptsRootFolderPath)
+        {
+            string userDefinedDataTypesScriptsFolderPath = Path.Combine(scriptsRootFolderPath, "User Defined Data Types");
+
+            return SqlServerScriptExecutor.ExecuteScriptsInFolder(userDefinedDataTypesScriptsFolderPath, this, 0);
         }
     }
 }
