@@ -1,8 +1,10 @@
 ﻿namespace DbUnicorn
 {
     using System;
+    using System.Collections.Generic;
     using System.Data;
     using System.Data.SqlClient;
+    using System.IO;
 
     public class SqlServerDatabase : IDatabase
     {
@@ -21,12 +23,23 @@
 
         // Public methods
 
-        public SqlBatchExecution ExecuteSqlBatch(string sqlBatch)
+        public List<SqlServerScript> CreateObjectsFromScripts(string scriptsRootFolderPath)
         {
-            SqlBatchExecution execution = new SqlBatchExecution(sqlBatch);
+            List<SqlServerScript> scripts = new List<SqlServerScript>();
+
+            scripts.AddRange(this.CreateSchemasFromScripts(scriptsRootFolderPath));
+            scripts.AddRange(this.CreateUserDefinedDataTypesFromScripts(scriptsRootFolderPath));
+            scripts.AddRange(this.CreateTablesFromScripts(scriptsRootFolderPath));
+
+            return scripts;
+        }
+
+        public SqlBatchExecution ExecuteSqlBatch(ISqlBatch sqlBatch)
+        {
+            SqlBatchExecution execution = new SqlBatchExecution();
             
             using (SqlConnection dbConnection = new SqlConnection(_connectionString))
-            using (SqlCommand dbSqlCommand = new SqlCommand(sqlBatch, dbConnection))
+            using (SqlCommand dbSqlCommand = new SqlCommand(sqlBatch.Sql, dbConnection))
             {
                 dbSqlCommand.CommandType = CommandType.Text;
                 dbConnection.Open();
@@ -37,11 +50,13 @@
                 }
                 catch (SqlException ex)
                 {
-                    execution.SqlException = ex;
+                    execution.Exception = ex;
                 }
 
                 dbConnection.Close();
             }
+
+            sqlBatch.Executions.Add(execution);
 
             return execution;
         }
@@ -190,6 +205,30 @@ WHERE	o_parent_schema.[name] = @objectSchemaName
             }
 
             return references;
+        }
+
+
+        // Private methods
+
+        private List<SqlServerScript> CreateSchemasFromScripts(string scriptsRootFolderPath)
+        {
+            string schemasScriptsFolderPath = Path.Combine(scriptsRootFolderPath, "Schemas");
+
+            return SqlServerScriptExecutor.ExecuteScriptsInFolder(schemasScriptsFolderPath, this, 0);
+        }
+        
+        private List<SqlServerScript> CreateTablesFromScripts(string scriptsRootFolderPath)
+        {
+            string tableScriptsFolderPath = Path.Combine(scriptsRootFolderPath, "Tables");
+            
+            return SqlServerScriptExecutor.ExecuteScriptsInFolder(tableScriptsFolderPath, this, 1);
+        }
+
+        private List<SqlServerScript> CreateUserDefinedDataTypesFromScripts(string scriptsRootFolderPath)
+        {
+            string userDefinedDataTypesScriptsFolderPath = Path.Combine(scriptsRootFolderPath, "User Defined Data Types");
+
+            return SqlServerScriptExecutor.ExecuteScriptsInFolder(userDefinedDataTypesScriptsFolderPath, this, 0);
         }
     }
 }

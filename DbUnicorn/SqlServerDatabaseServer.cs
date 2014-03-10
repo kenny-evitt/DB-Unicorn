@@ -19,9 +19,10 @@
         public IDatabase CreateDatabase(string databaseName)
         {
             _masterDatabase.ExecuteSqlBatch(
-                String.Format(
-                    @"CREATE DATABASE {0};",
-                    TransactSqlHelpers.Identifiers.ValidIdentifier(databaseName)));
+                new SqlServerBatch(
+                    String.Format(
+                        @"CREATE DATABASE {0};",
+                        TransactSqlHelpers.Identifiers.ValidIdentifier(databaseName))));
 
             return new SqlServerDatabase(this.ConnectionString(databaseName));
         }

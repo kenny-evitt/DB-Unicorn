@@ -40,11 +40,10 @@
     <Reference Include="System.Xml" />
     <Reference Include="TransactSqlHelpers, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\TransactSqlHelpers.1.0.7\lib\net40\TransactSqlHelpers.dll</HintPath>
+      <HintPath>..\packages\TransactSqlHelpers.1.0.8\lib\net40\TransactSqlHelpers.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DatabaseCreator.cs" />
     <Compile Include="DatabaseObjects\IDatabaseObject.cs" />
     <Compile Include="DatabaseObjects\Schema.cs" />
     <Compile Include="DatabaseObjects\ScriptingHelpers.cs" />
@@ -54,9 +53,12 @@
     <Compile Include="DatabaseSchemaAndData.cs" />
     <Compile Include="IDatabase.cs" />
     <Compile Include="IDatabaseServer.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ScriptExecutor.cs" />
+    <Compile Include="ISqlBatch.cs" />
     <Compile Include="SqlBatchExecution.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SqlServerBatch.cs" />
+    <Compile Include="SqlServerScript.cs" />
+    <Compile Include="SqlServerScriptExecutor.cs" />
     <Compile Include="SqlServerDatabase.cs" />
     <Compile Include="SqlServerDatabaseServer.cs" />
     <Compile Include="TableData.cs" />

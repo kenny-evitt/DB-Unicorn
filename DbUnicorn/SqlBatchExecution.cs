@@ -1,30 +1,9 @@
 ﻿namespace DbUnicorn
 {
-    using System.Data.SqlClient;
+    using System;
 
     public class SqlBatchExecution
     {
-        private readonly string _sqlBatch;
-
-
-        // Properties
-
-        public string SqlBatch
-        {
-            get
-            {
-                return _sqlBatch;
-            }
-        }
-
-        public SqlException SqlException { get; set; }
-
-
-        // Constructor
-
-        public SqlBatchExecution(string sqlBatch)
-        {
-            _sqlBatch = sqlBatch;
-        }
+        public Exception Exception { get; set; }
     }
 }

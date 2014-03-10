@@ -49,6 +49,7 @@
     <Compile Include="TestDatabases\DatabaseHelper.cs" />
     <Compile Include="TestDatabases\ForeignKeyRelationshipTreeDatabase.cs" />
     <Compile Include="TestDatabases\SelfReferencingTableDatabase.cs" />
+    <Compile Include="TestDatabases\TestDatabase.cs" />
     <Compile Include="TestDatabaseTester.cs" />
   </ItemGroup>
   <ItemGroup>
