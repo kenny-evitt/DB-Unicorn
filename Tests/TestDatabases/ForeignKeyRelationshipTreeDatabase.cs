@@ -38,7 +38,7 @@
 
         // Public methods
 
-        new public DataTable GetTableForeignKeyRelationshipReferencers(string schemaName, string tableName)
+        public override DataTable GetTableForeignKeyRelationshipReferencers(string schemaName, string tableName)
         {
             if (schemaName == _schemaName && tableName == _rootTableName)
             {
@@ -59,7 +59,7 @@
             }
         }
 
-        new public DataTable GetTableForeignKeyRelationshipReferences(string schemaName, string tableName)
+        public override DataTable GetTableForeignKeyRelationshipReferences(string schemaName, string tableName)
         {
             if (schemaName == _schemaName && tableName == _rootTableName)
             {
