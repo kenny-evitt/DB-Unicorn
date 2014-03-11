@@ -8,37 +8,37 @@
 
     public class TestDatabase : IDatabase
     {
-        public List<SqlServerScript> CreateObjectsFromScripts(string scriptsRootFolderPath)
+        public virtual List<SqlServerScript> CreateObjectsFromScripts(string scriptsRootFolderPath)
         {
             throw new NotImplementedException();
         }
 
-        public SqlBatchExecution ExecuteSqlBatch(ISqlBatch sqlBatch)
+        public virtual SqlBatchExecution ExecuteSqlBatch(ISqlBatch sqlBatch)
         {
             throw new NotImplementedException();
         }
 
-        public DataTable GetStoredProcedures()
+        public virtual DataTable GetStoredProcedures()
         {
             throw new NotImplementedException();
         }
 
-        public DataTable GetTable(int tableObjectId)
+        public virtual DataTable GetTable(int tableObjectId)
         {
             throw new NotImplementedException();
         }
 
-        public DataTable GetTableForeignKeyRelationshipReferencers(string schemaName, string tableName)
+        public virtual DataTable GetTableForeignKeyRelationshipReferencers(string schemaName, string tableName)
         {
             throw new NotImplementedException();
         }
 
-        public DataTable GetTableForeignKeyRelationshipReferences(string schemaName, string tableName)
+        public virtual DataTable GetTableForeignKeyRelationshipReferences(string schemaName, string tableName)
         {
             throw new NotImplementedException();
         }
 
-        public DataTable GetTables()
+        public virtual DataTable GetTables()
         {
             throw new NotImplementedException();
         }
