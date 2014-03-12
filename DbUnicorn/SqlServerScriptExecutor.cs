@@ -11,19 +11,33 @@
     {
         public static List<SqlServerScript> ExecuteScriptsInFolder(string folderPath, SqlServerDatabase targetDatabase, int? maxRetries)
         {
+            return
+                ExecuteScriptsInFolders(
+                    new List<string> { folderPath },
+                    targetDatabase,
+                    maxRetries);
+        }
+
+        public static List<SqlServerScript> ExecuteScriptsInFolders(IEnumerable<string> folderPaths, SqlServerDatabase targetDatabase, int? maxRetries)
+        {
             List<SqlServerScript> scripts = new List<SqlServerScript>();
-            
-            foreach (string fileName in Directory.EnumerateFiles(folderPath, "*.sql"))
+
+            foreach (string folderPath in folderPaths)
             {
-                SqlServerScript script = new SqlServerScript(Path.Combine(folderPath, fileName));
-
-                foreach (ISqlBatch batch in script.Batches)
+                foreach (string fileName in Directory.EnumerateFiles(folderPath, "*.sql"))
                 {
-                    targetDatabase.ExecuteSqlBatch(batch);
-                }
+                    SqlServerScript script = new SqlServerScript(Path.Combine(folderPath, fileName));
 
-                scripts.Add(script);
+                    foreach (ISqlBatch batch in script.Batches)
+                    {
+                        targetDatabase.ExecuteSqlBatch(batch);
+                    }
+
+                    scripts.Add(script);
+                }
             }
+
+            // TODO: Implement unlimited retries (carefully).
 
             while (maxRetries > 0)
             {
