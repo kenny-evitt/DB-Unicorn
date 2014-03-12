@@ -5,6 +5,7 @@
     using System.Data;
     using System.Data.SqlClient;
     using System.IO;
+    using System.Linq;
 
     public class SqlServerDatabase : IDatabase
     {
@@ -28,8 +29,10 @@
             List<SqlServerScript> scripts = new List<SqlServerScript>();
 
             scripts.AddRange(this.CreateSchemasFromScripts(scriptsRootFolderPath));
+            scripts.AddRange(this.CreateSynonymsFromScripts(scriptsRootFolderPath));
             scripts.AddRange(this.CreateUserDefinedDataTypesFromScripts(scriptsRootFolderPath));
             scripts.AddRange(this.CreateTablesFromScripts(scriptsRootFolderPath));
+            scripts.AddRange(this.CreateOtherObjectsFromScripts(scriptsRootFolderPath));
 
             return scripts;
         }
@@ -210,11 +213,36 @@ WHERE	o_parent_schema.[name] = @objectSchemaName
 
         // Private methods
 
+        private List<SqlServerScript> CreateOtherObjectsFromScripts(string scriptsRootFolderPath)
+        {
+            List<string> otherObjectsScriptsFolders =
+                new List<string>
+                {
+                    "Stored Procedures",
+                    "Triggers",
+                    "User Defined Functions",
+                    "Views"
+                };
+
+            IEnumerable<string> otherObjectsScriptsFolderPaths =
+                (from folder in otherObjectsScriptsFolders
+                 select Path.Combine(scriptsRootFolderPath, folder));
+
+            return SqlServerScriptExecutor.ExecuteScriptsInFolders(otherObjectsScriptsFolderPaths, this, 5);
+        }
+        
         private List<SqlServerScript> CreateSchemasFromScripts(string scriptsRootFolderPath)
         {
             string schemasScriptsFolderPath = Path.Combine(scriptsRootFolderPath, "Schemas");
 
             return SqlServerScriptExecutor.ExecuteScriptsInFolder(schemasScriptsFolderPath, this, 0);
+        }
+
+        private List<SqlServerScript> CreateSynonymsFromScripts(string scriptsRootFolderPath)
+        {
+            string synonymsScriptsFolderPath = Path.Combine(scriptsRootFolderPath, "Synonyms");
+
+            return SqlServerScriptExecutor.ExecuteScriptsInFolder(synonymsScriptsFolderPath, this, 0);
         }
         
         private List<SqlServerScript> CreateTablesFromScripts(string scriptsRootFolderPath)
