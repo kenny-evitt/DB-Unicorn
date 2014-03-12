@@ -1,6 +1,7 @@
 ﻿namespace DbUnicorn
 {
     using System;
+    using System.Linq;
 
     public class SqlServerDatabaseServer : IDatabaseServer
     {
@@ -18,11 +19,18 @@
 
         public IDatabase CreateDatabase(string databaseName)
         {
-            _masterDatabase.ExecuteSqlBatch(
+            SqlServerBatch batch =
                 new SqlServerBatch(
                     String.Format(
                         @"CREATE DATABASE {0};",
-                        TransactSqlHelpers.Identifiers.ValidIdentifier(databaseName))));
+                        TransactSqlHelpers.Identifiers.ValidIdentifier(databaseName)));
+
+            _masterDatabase.ExecuteSqlBatch(batch);
+
+            Exception lastBatchExecutionException = batch.Executions.Last().Exception;
+
+            if (lastBatchExecutionException != null)
+                throw new ApplicationException("Database creation failed.", lastBatchExecutionException);
 
             return new SqlServerDatabase(this.ConnectionString(databaseName));
         }
