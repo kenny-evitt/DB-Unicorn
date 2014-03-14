@@ -37,19 +37,29 @@
                 }
             }
 
-            // TODO: Implement unlimited retries (carefully).
+            int countFailedBatches;
+            int previousCountFailedBatches = 0;
 
-            while (maxRetries > 0)
+            while (maxRetries > 0 || maxRetries == null)
             {
+                countFailedBatches = 0;
+
                 foreach (SqlServerScript script in scripts)
                 {
                     foreach (SqlServerBatch batch in script.Batches)
                     {
                         if (batch.Executions.Last().Exception != null)
+                        {
+                            countFailedBatches++;
                             targetDatabase.ExecuteSqlBatch(batch);
+                        }
                     }
                 }
 
+                if (countFailedBatches == previousCountFailedBatches)
+                    break;
+
+                previousCountFailedBatches = countFailedBatches;
                 maxRetries--;
             }
 
