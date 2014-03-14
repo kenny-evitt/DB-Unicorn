@@ -228,7 +228,7 @@ WHERE	o_parent_schema.[name] = @objectSchemaName
                 (from folder in otherObjectsScriptsFolders
                  select Path.Combine(scriptsRootFolderPath, folder));
 
-            return SqlServerScriptExecutor.ExecuteScriptsInFolders(otherObjectsScriptsFolderPaths, this, 5);
+            return SqlServerScriptExecutor.ExecuteScriptsInFolders(otherObjectsScriptsFolderPaths, this, null);
         }
         
         private List<SqlServerScript> CreateSchemasFromScripts(string scriptsRootFolderPath)
